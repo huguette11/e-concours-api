@@ -1,0 +1,30 @@
+### GET ALL CANDIDATS 
+
+GET http://localhost:3000/candidats/
+
+### CREATE NEW CANDIDAT
+POST http://localhost:3000/candidats/
+Content-Type: application/json
+
+{
+  "nom": "Zabre",
+  "prenom": "Leo",
+  "sexe": "Homme",
+  "date_naissance": "2003-10-25",
+  "lieu_naissance": "Ouagadougou",
+  "pays_naissance": "Burkina Faso",
+  "numero_cnib": "B14344",
+  "date_delivrance": "2020-05-12",
+  "telephone": "60000001",
+  "email": "leoe2@gmail.com",
+  "mot_de_passe": "pass1234"
+}
+### Login candidat
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "leoe2@gmail.com",
+  "mot_de_passe": "pass1234"
+}
+
