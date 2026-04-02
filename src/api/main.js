@@ -3,6 +3,7 @@ import pool from "./index.js";
 import candidatRoutes from "./routes/candidat.route.js";
 import authRoutes from "./routes/auth.route.js";
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
