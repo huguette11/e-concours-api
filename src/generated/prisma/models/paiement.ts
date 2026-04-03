@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model paiement
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * 
  */
 export type paiementModel = runtime.Types.Result.DefaultSelection<Prisma.$paiementPayload>
 
@@ -194,10 +194,10 @@ export type paiementGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type PaiementGroupByOutputType = {
   id_paiement: string
   montant: runtime.Decimal
-  date_paiement: Date | null
+  date_paiement: Date
   mode_paiement: string | null
   reference_transaction: string | null
-  statut_paiement: string | null
+  statut_paiement: string
   id_inscription: string
   _count: PaiementCountAggregateOutputType | null
   _avg: PaiementAvgAggregateOutputType | null
@@ -225,23 +225,23 @@ export type paiementWhereInput = {
   AND?: Prisma.paiementWhereInput | Prisma.paiementWhereInput[]
   OR?: Prisma.paiementWhereInput[]
   NOT?: Prisma.paiementWhereInput | Prisma.paiementWhereInput[]
-  id_paiement?: Prisma.StringFilter<"paiement"> | string
+  id_paiement?: Prisma.UuidFilter<"paiement"> | string
   montant?: Prisma.DecimalFilter<"paiement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.DateTimeNullableFilter<"paiement"> | Date | string | null
+  date_paiement?: Prisma.DateTimeFilter<"paiement"> | Date | string
   mode_paiement?: Prisma.StringNullableFilter<"paiement"> | string | null
   reference_transaction?: Prisma.StringNullableFilter<"paiement"> | string | null
-  statut_paiement?: Prisma.StringNullableFilter<"paiement"> | string | null
-  id_inscription?: Prisma.StringFilter<"paiement"> | string
+  statut_paiement?: Prisma.StringFilter<"paiement"> | string
+  id_inscription?: Prisma.UuidFilter<"paiement"> | string
   inscription?: Prisma.XOR<Prisma.InscriptionScalarRelationFilter, Prisma.inscriptionWhereInput>
 }
 
 export type paiementOrderByWithRelationInput = {
   id_paiement?: Prisma.SortOrder
   montant?: Prisma.SortOrder
-  date_paiement?: Prisma.SortOrderInput | Prisma.SortOrder
+  date_paiement?: Prisma.SortOrder
   mode_paiement?: Prisma.SortOrderInput | Prisma.SortOrder
   reference_transaction?: Prisma.SortOrderInput | Prisma.SortOrder
-  statut_paiement?: Prisma.SortOrderInput | Prisma.SortOrder
+  statut_paiement?: Prisma.SortOrder
   id_inscription?: Prisma.SortOrder
   inscription?: Prisma.inscriptionOrderByWithRelationInput
 }
@@ -253,20 +253,20 @@ export type paiementWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.paiementWhereInput[]
   NOT?: Prisma.paiementWhereInput | Prisma.paiementWhereInput[]
   montant?: Prisma.DecimalFilter<"paiement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.DateTimeNullableFilter<"paiement"> | Date | string | null
+  date_paiement?: Prisma.DateTimeFilter<"paiement"> | Date | string
   mode_paiement?: Prisma.StringNullableFilter<"paiement"> | string | null
-  statut_paiement?: Prisma.StringNullableFilter<"paiement"> | string | null
-  id_inscription?: Prisma.StringFilter<"paiement"> | string
+  statut_paiement?: Prisma.StringFilter<"paiement"> | string
+  id_inscription?: Prisma.UuidFilter<"paiement"> | string
   inscription?: Prisma.XOR<Prisma.InscriptionScalarRelationFilter, Prisma.inscriptionWhereInput>
 }, "id_paiement" | "reference_transaction">
 
 export type paiementOrderByWithAggregationInput = {
   id_paiement?: Prisma.SortOrder
   montant?: Prisma.SortOrder
-  date_paiement?: Prisma.SortOrderInput | Prisma.SortOrder
+  date_paiement?: Prisma.SortOrder
   mode_paiement?: Prisma.SortOrderInput | Prisma.SortOrder
   reference_transaction?: Prisma.SortOrderInput | Prisma.SortOrder
-  statut_paiement?: Prisma.SortOrderInput | Prisma.SortOrder
+  statut_paiement?: Prisma.SortOrder
   id_inscription?: Prisma.SortOrder
   _count?: Prisma.paiementCountOrderByAggregateInput
   _avg?: Prisma.paiementAvgOrderByAggregateInput
@@ -279,81 +279,81 @@ export type paiementScalarWhereWithAggregatesInput = {
   AND?: Prisma.paiementScalarWhereWithAggregatesInput | Prisma.paiementScalarWhereWithAggregatesInput[]
   OR?: Prisma.paiementScalarWhereWithAggregatesInput[]
   NOT?: Prisma.paiementScalarWhereWithAggregatesInput | Prisma.paiementScalarWhereWithAggregatesInput[]
-  id_paiement?: Prisma.StringWithAggregatesFilter<"paiement"> | string
+  id_paiement?: Prisma.UuidWithAggregatesFilter<"paiement"> | string
   montant?: Prisma.DecimalWithAggregatesFilter<"paiement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.DateTimeNullableWithAggregatesFilter<"paiement"> | Date | string | null
+  date_paiement?: Prisma.DateTimeWithAggregatesFilter<"paiement"> | Date | string
   mode_paiement?: Prisma.StringNullableWithAggregatesFilter<"paiement"> | string | null
   reference_transaction?: Prisma.StringNullableWithAggregatesFilter<"paiement"> | string | null
-  statut_paiement?: Prisma.StringNullableWithAggregatesFilter<"paiement"> | string | null
-  id_inscription?: Prisma.StringWithAggregatesFilter<"paiement"> | string
+  statut_paiement?: Prisma.StringWithAggregatesFilter<"paiement"> | string
+  id_inscription?: Prisma.UuidWithAggregatesFilter<"paiement"> | string
 }
 
 export type paiementCreateInput = {
-  id_paiement: string
+  id_paiement?: string
   montant: runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Date | string | null
+  date_paiement?: Date | string
   mode_paiement?: string | null
   reference_transaction?: string | null
-  statut_paiement?: string | null
+  statut_paiement?: string
   inscription: Prisma.inscriptionCreateNestedOneWithoutPaiementInput
 }
 
 export type paiementUncheckedCreateInput = {
-  id_paiement: string
+  id_paiement?: string
   montant: runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Date | string | null
+  date_paiement?: Date | string
   mode_paiement?: string | null
   reference_transaction?: string | null
-  statut_paiement?: string | null
+  statut_paiement?: string
   id_inscription: string
 }
 
 export type paiementUpdateInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   inscription?: Prisma.inscriptionUpdateOneRequiredWithoutPaiementNestedInput
 }
 
 export type paiementUncheckedUpdateInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type paiementCreateManyInput = {
-  id_paiement: string
+  id_paiement?: string
   montant: runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Date | string | null
+  date_paiement?: Date | string
   mode_paiement?: string | null
   reference_transaction?: string | null
-  statut_paiement?: string | null
+  statut_paiement?: string
   id_inscription: string
 }
 
 export type paiementUpdateManyMutationInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type paiementUncheckedUpdateManyInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -448,21 +448,21 @@ export type paiementUncheckedUpdateManyWithoutInscriptionNestedInput = {
 }
 
 export type paiementCreateWithoutInscriptionInput = {
-  id_paiement: string
+  id_paiement?: string
   montant: runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Date | string | null
+  date_paiement?: Date | string
   mode_paiement?: string | null
   reference_transaction?: string | null
-  statut_paiement?: string | null
+  statut_paiement?: string
 }
 
 export type paiementUncheckedCreateWithoutInscriptionInput = {
-  id_paiement: string
+  id_paiement?: string
   montant: runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Date | string | null
+  date_paiement?: Date | string
   mode_paiement?: string | null
   reference_transaction?: string | null
-  statut_paiement?: string | null
+  statut_paiement?: string
 }
 
 export type paiementCreateOrConnectWithoutInscriptionInput = {
@@ -495,49 +495,49 @@ export type paiementScalarWhereInput = {
   AND?: Prisma.paiementScalarWhereInput | Prisma.paiementScalarWhereInput[]
   OR?: Prisma.paiementScalarWhereInput[]
   NOT?: Prisma.paiementScalarWhereInput | Prisma.paiementScalarWhereInput[]
-  id_paiement?: Prisma.StringFilter<"paiement"> | string
+  id_paiement?: Prisma.UuidFilter<"paiement"> | string
   montant?: Prisma.DecimalFilter<"paiement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.DateTimeNullableFilter<"paiement"> | Date | string | null
+  date_paiement?: Prisma.DateTimeFilter<"paiement"> | Date | string
   mode_paiement?: Prisma.StringNullableFilter<"paiement"> | string | null
   reference_transaction?: Prisma.StringNullableFilter<"paiement"> | string | null
-  statut_paiement?: Prisma.StringNullableFilter<"paiement"> | string | null
-  id_inscription?: Prisma.StringFilter<"paiement"> | string
+  statut_paiement?: Prisma.StringFilter<"paiement"> | string
+  id_inscription?: Prisma.UuidFilter<"paiement"> | string
 }
 
 export type paiementCreateManyInscriptionInput = {
-  id_paiement: string
+  id_paiement?: string
   montant: runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Date | string | null
+  date_paiement?: Date | string
   mode_paiement?: string | null
   reference_transaction?: string | null
-  statut_paiement?: string | null
+  statut_paiement?: string
 }
 
 export type paiementUpdateWithoutInscriptionInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type paiementUncheckedUpdateWithoutInscriptionInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type paiementUncheckedUpdateManyWithoutInscriptionInput = {
   id_paiement?: Prisma.StringFieldUpdateOperationsInput | string
   montant?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  date_paiement?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_paiement?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference_transaction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_paiement?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_paiement?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -604,10 +604,10 @@ export type $paiementPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_paiement: string
     montant: runtime.Decimal
-    date_paiement: Date | null
+    date_paiement: Date
     mode_paiement: string | null
     reference_transaction: string | null
-    statut_paiement: string | null
+    statut_paiement: string
     id_inscription: string
   }, ExtArgs["result"]["paiement"]>
   composites: {}

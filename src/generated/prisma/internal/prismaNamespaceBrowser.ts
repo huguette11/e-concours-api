@@ -59,7 +59,7 @@ export const ModelName = {
   examen: 'examen',
   inscription: 'inscription',
   paiement: 'paiement',
-  passer: 'passer'
+  resultat: 'resultat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -86,7 +86,9 @@ export const AdminScalarFieldEnum = {
   mot_de_passe: 'mot_de_passe',
   telephone: 'telephone',
   role: 'role',
-  date_creation: 'date_creation'
+  actif: 'actif',
+  date_creation: 'date_creation',
+  updated_at: 'updated_at'
 } as const
 
 export type AdminScalarFieldEnum = (typeof AdminScalarFieldEnum)[keyof typeof AdminScalarFieldEnum]
@@ -130,6 +132,8 @@ export const ConcoursScalarFieldEnum = {
   type: 'type',
   description: 'description',
   frais_inscription: 'frais_inscription',
+  nombre_postes: 'nombre_postes',
+  annee: 'annee',
   date_debut: 'date_debut',
   date_fin: 'date_fin',
   statut_concours: 'statut_concours',
@@ -186,7 +190,7 @@ export const PaiementScalarFieldEnum = {
 export type PaiementScalarFieldEnum = (typeof PaiementScalarFieldEnum)[keyof typeof PaiementScalarFieldEnum]
 
 
-export const PasserScalarFieldEnum = {
+export const ResultatScalarFieldEnum = {
   id_candidat: 'id_candidat',
   id_examen: 'id_examen',
   note: 'note',
@@ -194,7 +198,7 @@ export const PasserScalarFieldEnum = {
   statut: 'statut'
 } as const
 
-export type PasserScalarFieldEnum = (typeof PasserScalarFieldEnum)[keyof typeof PasserScalarFieldEnum]
+export type ResultatScalarFieldEnum = (typeof ResultatScalarFieldEnum)[keyof typeof ResultatScalarFieldEnum]
 
 
 export const SortOrder = {

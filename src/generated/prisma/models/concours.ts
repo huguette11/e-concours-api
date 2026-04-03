@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model concours
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * 
  */
 export type concoursModel = runtime.Types.Result.DefaultSelection<Prisma.$concoursPayload>
 
@@ -28,18 +28,24 @@ export type AggregateConcours = {
 
 export type ConcoursAvgAggregateOutputType = {
   frais_inscription: runtime.Decimal | null
+  nombre_postes: number | null
+  annee: number | null
 }
 
 export type ConcoursSumAggregateOutputType = {
   frais_inscription: runtime.Decimal | null
+  nombre_postes: number | null
+  annee: number | null
 }
 
 export type ConcoursMinAggregateOutputType = {
   id_concours: string | null
   nom: string | null
-  type: string | null
+  type: $Enums.TypeConcours | null
   description: string | null
   frais_inscription: runtime.Decimal | null
+  nombre_postes: number | null
+  annee: number | null
   date_debut: Date | null
   date_fin: Date | null
   statut_concours: string | null
@@ -49,9 +55,11 @@ export type ConcoursMinAggregateOutputType = {
 export type ConcoursMaxAggregateOutputType = {
   id_concours: string | null
   nom: string | null
-  type: string | null
+  type: $Enums.TypeConcours | null
   description: string | null
   frais_inscription: runtime.Decimal | null
+  nombre_postes: number | null
+  annee: number | null
   date_debut: Date | null
   date_fin: Date | null
   statut_concours: string | null
@@ -64,6 +72,8 @@ export type ConcoursCountAggregateOutputType = {
   type: number
   description: number
   frais_inscription: number
+  nombre_postes: number
+  annee: number
   date_debut: number
   date_fin: number
   statut_concours: number
@@ -74,10 +84,14 @@ export type ConcoursCountAggregateOutputType = {
 
 export type ConcoursAvgAggregateInputType = {
   frais_inscription?: true
+  nombre_postes?: true
+  annee?: true
 }
 
 export type ConcoursSumAggregateInputType = {
   frais_inscription?: true
+  nombre_postes?: true
+  annee?: true
 }
 
 export type ConcoursMinAggregateInputType = {
@@ -86,6 +100,8 @@ export type ConcoursMinAggregateInputType = {
   type?: true
   description?: true
   frais_inscription?: true
+  nombre_postes?: true
+  annee?: true
   date_debut?: true
   date_fin?: true
   statut_concours?: true
@@ -98,6 +114,8 @@ export type ConcoursMaxAggregateInputType = {
   type?: true
   description?: true
   frais_inscription?: true
+  nombre_postes?: true
+  annee?: true
   date_debut?: true
   date_fin?: true
   statut_concours?: true
@@ -110,6 +128,8 @@ export type ConcoursCountAggregateInputType = {
   type?: true
   description?: true
   frais_inscription?: true
+  nombre_postes?: true
+  annee?: true
   date_debut?: true
   date_fin?: true
   statut_concours?: true
@@ -206,12 +226,14 @@ export type concoursGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type ConcoursGroupByOutputType = {
   id_concours: string
   nom: string
-  type: string | null
+  type: $Enums.TypeConcours
   description: string | null
   frais_inscription: runtime.Decimal
+  nombre_postes: number
+  annee: number
   date_debut: Date
   date_fin: Date
-  statut_concours: string | null
+  statut_concours: string
   id_admin: string | null
   _count: ConcoursCountAggregateOutputType | null
   _avg: ConcoursAvgAggregateOutputType | null
@@ -239,15 +261,17 @@ export type concoursWhereInput = {
   AND?: Prisma.concoursWhereInput | Prisma.concoursWhereInput[]
   OR?: Prisma.concoursWhereInput[]
   NOT?: Prisma.concoursWhereInput | Prisma.concoursWhereInput[]
-  id_concours?: Prisma.StringFilter<"concours"> | string
+  id_concours?: Prisma.UuidFilter<"concours"> | string
   nom?: Prisma.StringFilter<"concours"> | string
-  type?: Prisma.StringNullableFilter<"concours"> | string | null
+  type?: Prisma.EnumTypeConcoursFilter<"concours"> | $Enums.TypeConcours
   description?: Prisma.StringNullableFilter<"concours"> | string | null
   frais_inscription?: Prisma.DecimalFilter<"concours"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFilter<"concours"> | number
+  annee?: Prisma.IntFilter<"concours"> | number
   date_debut?: Prisma.DateTimeFilter<"concours"> | Date | string
   date_fin?: Prisma.DateTimeFilter<"concours"> | Date | string
-  statut_concours?: Prisma.StringNullableFilter<"concours"> | string | null
-  id_admin?: Prisma.StringNullableFilter<"concours"> | string | null
+  statut_concours?: Prisma.StringFilter<"concours"> | string
+  id_admin?: Prisma.UuidNullableFilter<"concours"> | string | null
   admin?: Prisma.XOR<Prisma.AdminNullableScalarRelationFilter, Prisma.adminWhereInput> | null
   examen?: Prisma.ExamenListRelationFilter
   inscription?: Prisma.InscriptionListRelationFilter
@@ -256,12 +280,14 @@ export type concoursWhereInput = {
 export type concoursOrderByWithRelationInput = {
   id_concours?: Prisma.SortOrder
   nom?: Prisma.SortOrder
-  type?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
   date_debut?: Prisma.SortOrder
   date_fin?: Prisma.SortOrder
-  statut_concours?: Prisma.SortOrderInput | Prisma.SortOrder
+  statut_concours?: Prisma.SortOrder
   id_admin?: Prisma.SortOrderInput | Prisma.SortOrder
   admin?: Prisma.adminOrderByWithRelationInput
   examen?: Prisma.examenOrderByRelationAggregateInput
@@ -274,13 +300,15 @@ export type concoursWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.concoursWhereInput[]
   NOT?: Prisma.concoursWhereInput | Prisma.concoursWhereInput[]
   nom?: Prisma.StringFilter<"concours"> | string
-  type?: Prisma.StringNullableFilter<"concours"> | string | null
+  type?: Prisma.EnumTypeConcoursFilter<"concours"> | $Enums.TypeConcours
   description?: Prisma.StringNullableFilter<"concours"> | string | null
   frais_inscription?: Prisma.DecimalFilter<"concours"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFilter<"concours"> | number
+  annee?: Prisma.IntFilter<"concours"> | number
   date_debut?: Prisma.DateTimeFilter<"concours"> | Date | string
   date_fin?: Prisma.DateTimeFilter<"concours"> | Date | string
-  statut_concours?: Prisma.StringNullableFilter<"concours"> | string | null
-  id_admin?: Prisma.StringNullableFilter<"concours"> | string | null
+  statut_concours?: Prisma.StringFilter<"concours"> | string
+  id_admin?: Prisma.UuidNullableFilter<"concours"> | string | null
   admin?: Prisma.XOR<Prisma.AdminNullableScalarRelationFilter, Prisma.adminWhereInput> | null
   examen?: Prisma.ExamenListRelationFilter
   inscription?: Prisma.InscriptionListRelationFilter
@@ -289,12 +317,14 @@ export type concoursWhereUniqueInput = Prisma.AtLeast<{
 export type concoursOrderByWithAggregationInput = {
   id_concours?: Prisma.SortOrder
   nom?: Prisma.SortOrder
-  type?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
   date_debut?: Prisma.SortOrder
   date_fin?: Prisma.SortOrder
-  statut_concours?: Prisma.SortOrderInput | Prisma.SortOrder
+  statut_concours?: Prisma.SortOrder
   id_admin?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.concoursCountOrderByAggregateInput
   _avg?: Prisma.concoursAvgOrderByAggregateInput
@@ -307,40 +337,46 @@ export type concoursScalarWhereWithAggregatesInput = {
   AND?: Prisma.concoursScalarWhereWithAggregatesInput | Prisma.concoursScalarWhereWithAggregatesInput[]
   OR?: Prisma.concoursScalarWhereWithAggregatesInput[]
   NOT?: Prisma.concoursScalarWhereWithAggregatesInput | Prisma.concoursScalarWhereWithAggregatesInput[]
-  id_concours?: Prisma.StringWithAggregatesFilter<"concours"> | string
+  id_concours?: Prisma.UuidWithAggregatesFilter<"concours"> | string
   nom?: Prisma.StringWithAggregatesFilter<"concours"> | string
-  type?: Prisma.StringNullableWithAggregatesFilter<"concours"> | string | null
+  type?: Prisma.EnumTypeConcoursWithAggregatesFilter<"concours"> | $Enums.TypeConcours
   description?: Prisma.StringNullableWithAggregatesFilter<"concours"> | string | null
   frais_inscription?: Prisma.DecimalWithAggregatesFilter<"concours"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntWithAggregatesFilter<"concours"> | number
+  annee?: Prisma.IntWithAggregatesFilter<"concours"> | number
   date_debut?: Prisma.DateTimeWithAggregatesFilter<"concours"> | Date | string
   date_fin?: Prisma.DateTimeWithAggregatesFilter<"concours"> | Date | string
-  statut_concours?: Prisma.StringNullableWithAggregatesFilter<"concours"> | string | null
-  id_admin?: Prisma.StringNullableWithAggregatesFilter<"concours"> | string | null
+  statut_concours?: Prisma.StringWithAggregatesFilter<"concours"> | string
+  id_admin?: Prisma.UuidNullableWithAggregatesFilter<"concours"> | string | null
 }
 
 export type concoursCreateInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   admin?: Prisma.adminCreateNestedOneWithoutConcoursInput
   examen?: Prisma.examenCreateNestedManyWithoutConcoursInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutConcoursInput
 }
 
 export type concoursUncheckedCreateInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   id_admin?: string | null
   examen?: Prisma.examenUncheckedCreateNestedManyWithoutConcoursInput
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutConcoursInput
@@ -349,12 +385,14 @@ export type concoursUncheckedCreateInput = {
 export type concoursUpdateInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   admin?: Prisma.adminUpdateOneWithoutConcoursNestedInput
   examen?: Prisma.examenUpdateManyWithoutConcoursNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutConcoursNestedInput
@@ -363,49 +401,57 @@ export type concoursUpdateInput = {
 export type concoursUncheckedUpdateInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   id_admin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   examen?: Prisma.examenUncheckedUpdateManyWithoutConcoursNestedInput
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutConcoursNestedInput
 }
 
 export type concoursCreateManyInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   id_admin?: string | null
 }
 
 export type concoursUpdateManyMutationInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type concoursUncheckedUpdateManyInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   id_admin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -425,6 +471,8 @@ export type concoursCountOrderByAggregateInput = {
   type?: Prisma.SortOrder
   description?: Prisma.SortOrder
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
   date_debut?: Prisma.SortOrder
   date_fin?: Prisma.SortOrder
   statut_concours?: Prisma.SortOrder
@@ -433,6 +481,8 @@ export type concoursCountOrderByAggregateInput = {
 
 export type concoursAvgOrderByAggregateInput = {
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
 }
 
 export type concoursMaxOrderByAggregateInput = {
@@ -441,6 +491,8 @@ export type concoursMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   description?: Prisma.SortOrder
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
   date_debut?: Prisma.SortOrder
   date_fin?: Prisma.SortOrder
   statut_concours?: Prisma.SortOrder
@@ -453,6 +505,8 @@ export type concoursMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   description?: Prisma.SortOrder
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
   date_debut?: Prisma.SortOrder
   date_fin?: Prisma.SortOrder
   statut_concours?: Prisma.SortOrder
@@ -461,6 +515,8 @@ export type concoursMinOrderByAggregateInput = {
 
 export type concoursSumOrderByAggregateInput = {
   frais_inscription?: Prisma.SortOrder
+  nombre_postes?: Prisma.SortOrder
+  annee?: Prisma.SortOrder
 }
 
 export type ConcoursScalarRelationFilter = {
@@ -510,12 +566,24 @@ export type concoursUncheckedUpdateManyWithoutAdminNestedInput = {
   deleteMany?: Prisma.concoursScalarWhereInput | Prisma.concoursScalarWhereInput[]
 }
 
+export type EnumTypeConcoursFieldUpdateOperationsInput = {
+  set?: $Enums.TypeConcours
+}
+
 export type DecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type concoursCreateNestedOneWithoutExamenInput = {
@@ -547,27 +615,31 @@ export type concoursUpdateOneRequiredWithoutInscriptionNestedInput = {
 }
 
 export type concoursCreateWithoutAdminInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   examen?: Prisma.examenCreateNestedManyWithoutConcoursInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutConcoursInput
 }
 
 export type concoursUncheckedCreateWithoutAdminInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   examen?: Prisma.examenUncheckedCreateNestedManyWithoutConcoursInput
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutConcoursInput
 }
@@ -602,39 +674,45 @@ export type concoursScalarWhereInput = {
   AND?: Prisma.concoursScalarWhereInput | Prisma.concoursScalarWhereInput[]
   OR?: Prisma.concoursScalarWhereInput[]
   NOT?: Prisma.concoursScalarWhereInput | Prisma.concoursScalarWhereInput[]
-  id_concours?: Prisma.StringFilter<"concours"> | string
+  id_concours?: Prisma.UuidFilter<"concours"> | string
   nom?: Prisma.StringFilter<"concours"> | string
-  type?: Prisma.StringNullableFilter<"concours"> | string | null
+  type?: Prisma.EnumTypeConcoursFilter<"concours"> | $Enums.TypeConcours
   description?: Prisma.StringNullableFilter<"concours"> | string | null
   frais_inscription?: Prisma.DecimalFilter<"concours"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFilter<"concours"> | number
+  annee?: Prisma.IntFilter<"concours"> | number
   date_debut?: Prisma.DateTimeFilter<"concours"> | Date | string
   date_fin?: Prisma.DateTimeFilter<"concours"> | Date | string
-  statut_concours?: Prisma.StringNullableFilter<"concours"> | string | null
-  id_admin?: Prisma.StringNullableFilter<"concours"> | string | null
+  statut_concours?: Prisma.StringFilter<"concours"> | string
+  id_admin?: Prisma.UuidNullableFilter<"concours"> | string | null
 }
 
 export type concoursCreateWithoutExamenInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   admin?: Prisma.adminCreateNestedOneWithoutConcoursInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutConcoursInput
 }
 
 export type concoursUncheckedCreateWithoutExamenInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   id_admin?: string | null
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutConcoursInput
 }
@@ -658,12 +736,14 @@ export type concoursUpdateToOneWithWhereWithoutExamenInput = {
 export type concoursUpdateWithoutExamenInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   admin?: Prisma.adminUpdateOneWithoutConcoursNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutConcoursNestedInput
 }
@@ -671,38 +751,44 @@ export type concoursUpdateWithoutExamenInput = {
 export type concoursUncheckedUpdateWithoutExamenInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   id_admin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutConcoursNestedInput
 }
 
 export type concoursCreateWithoutInscriptionInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   admin?: Prisma.adminCreateNestedOneWithoutConcoursInput
   examen?: Prisma.examenCreateNestedManyWithoutConcoursInput
 }
 
 export type concoursUncheckedCreateWithoutInscriptionInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
   id_admin?: string | null
   examen?: Prisma.examenUncheckedCreateNestedManyWithoutConcoursInput
 }
@@ -726,12 +812,14 @@ export type concoursUpdateToOneWithWhereWithoutInscriptionInput = {
 export type concoursUpdateWithoutInscriptionInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   admin?: Prisma.adminUpdateOneWithoutConcoursNestedInput
   examen?: Prisma.examenUpdateManyWithoutConcoursNestedInput
 }
@@ -739,36 +827,42 @@ export type concoursUpdateWithoutInscriptionInput = {
 export type concoursUncheckedUpdateWithoutInscriptionInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   id_admin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   examen?: Prisma.examenUncheckedUpdateManyWithoutConcoursNestedInput
 }
 
 export type concoursCreateManyAdminInput = {
-  id_concours: string
+  id_concours?: string
   nom: string
-  type?: string | null
+  type: $Enums.TypeConcours
   description?: string | null
   frais_inscription: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes: number
+  annee: number
   date_debut: Date | string
   date_fin: Date | string
-  statut_concours?: string | null
+  statut_concours?: string
 }
 
 export type concoursUpdateWithoutAdminInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   examen?: Prisma.examenUpdateManyWithoutConcoursNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutConcoursNestedInput
 }
@@ -776,12 +870,14 @@ export type concoursUpdateWithoutAdminInput = {
 export type concoursUncheckedUpdateWithoutAdminInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
   examen?: Prisma.examenUncheckedUpdateManyWithoutConcoursNestedInput
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutConcoursNestedInput
 }
@@ -789,12 +885,14 @@ export type concoursUncheckedUpdateWithoutAdminInput = {
 export type concoursUncheckedUpdateManyWithoutAdminInput = {
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumTypeConcoursFieldUpdateOperationsInput | $Enums.TypeConcours
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   frais_inscription?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nombre_postes?: Prisma.IntFieldUpdateOperationsInput | number
+  annee?: Prisma.IntFieldUpdateOperationsInput | number
   date_debut?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   date_fin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  statut_concours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statut_concours?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -843,6 +941,8 @@ export type concoursSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   type?: boolean
   description?: boolean
   frais_inscription?: boolean
+  nombre_postes?: boolean
+  annee?: boolean
   date_debut?: boolean
   date_fin?: boolean
   statut_concours?: boolean
@@ -859,6 +959,8 @@ export type concoursSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   type?: boolean
   description?: boolean
   frais_inscription?: boolean
+  nombre_postes?: boolean
+  annee?: boolean
   date_debut?: boolean
   date_fin?: boolean
   statut_concours?: boolean
@@ -872,6 +974,8 @@ export type concoursSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   type?: boolean
   description?: boolean
   frais_inscription?: boolean
+  nombre_postes?: boolean
+  annee?: boolean
   date_debut?: boolean
   date_fin?: boolean
   statut_concours?: boolean
@@ -885,13 +989,15 @@ export type concoursSelectScalar = {
   type?: boolean
   description?: boolean
   frais_inscription?: boolean
+  nombre_postes?: boolean
+  annee?: boolean
   date_debut?: boolean
   date_fin?: boolean
   statut_concours?: boolean
   id_admin?: boolean
 }
 
-export type concoursOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_concours" | "nom" | "type" | "description" | "frais_inscription" | "date_debut" | "date_fin" | "statut_concours" | "id_admin", ExtArgs["result"]["concours"]>
+export type concoursOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_concours" | "nom" | "type" | "description" | "frais_inscription" | "nombre_postes" | "annee" | "date_debut" | "date_fin" | "statut_concours" | "id_admin", ExtArgs["result"]["concours"]>
 export type concoursInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin?: boolean | Prisma.concours$adminArgs<ExtArgs>
   examen?: boolean | Prisma.concours$examenArgs<ExtArgs>
@@ -915,12 +1021,14 @@ export type $concoursPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_concours: string
     nom: string
-    type: string | null
+    type: $Enums.TypeConcours
     description: string | null
     frais_inscription: runtime.Decimal
+    nombre_postes: number
+    annee: number
     date_debut: Date
     date_fin: Date
-    statut_concours: string | null
+    statut_concours: string
     id_admin: string | null
   }, ExtArgs["result"]["concours"]>
   composites: {}
@@ -1350,9 +1458,11 @@ export interface Prisma__concoursClient<T, Null = never, ExtArgs extends runtime
 export interface concoursFieldRefs {
   readonly id_concours: Prisma.FieldRef<"concours", 'String'>
   readonly nom: Prisma.FieldRef<"concours", 'String'>
-  readonly type: Prisma.FieldRef<"concours", 'String'>
+  readonly type: Prisma.FieldRef<"concours", 'TypeConcours'>
   readonly description: Prisma.FieldRef<"concours", 'String'>
   readonly frais_inscription: Prisma.FieldRef<"concours", 'Decimal'>
+  readonly nombre_postes: Prisma.FieldRef<"concours", 'Int'>
+  readonly annee: Prisma.FieldRef<"concours", 'Int'>
   readonly date_debut: Prisma.FieldRef<"concours", 'DateTime'>
   readonly date_fin: Prisma.FieldRef<"concours", 'DateTime'>
   readonly statut_concours: Prisma.FieldRef<"concours", 'String'>

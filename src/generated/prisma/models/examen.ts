@@ -184,14 +184,14 @@ export type examenWhereInput = {
   AND?: Prisma.examenWhereInput | Prisma.examenWhereInput[]
   OR?: Prisma.examenWhereInput[]
   NOT?: Prisma.examenWhereInput | Prisma.examenWhereInput[]
-  id_examen?: Prisma.StringFilter<"examen"> | string
+  id_examen?: Prisma.UuidFilter<"examen"> | string
   date_examen?: Prisma.DateTimeFilter<"examen"> | Date | string
   heure?: Prisma.DateTimeNullableFilter<"examen"> | Date | string | null
   lieu?: Prisma.StringNullableFilter<"examen"> | string | null
   type_examen?: Prisma.StringNullableFilter<"examen"> | string | null
-  id_concours?: Prisma.StringFilter<"examen"> | string
+  id_concours?: Prisma.UuidFilter<"examen"> | string
   concours?: Prisma.XOR<Prisma.ConcoursScalarRelationFilter, Prisma.concoursWhereInput>
-  passer?: Prisma.PasserListRelationFilter
+  resultat?: Prisma.ResultatListRelationFilter
 }
 
 export type examenOrderByWithRelationInput = {
@@ -202,7 +202,7 @@ export type examenOrderByWithRelationInput = {
   type_examen?: Prisma.SortOrderInput | Prisma.SortOrder
   id_concours?: Prisma.SortOrder
   concours?: Prisma.concoursOrderByWithRelationInput
-  passer?: Prisma.passerOrderByRelationAggregateInput
+  resultat?: Prisma.resultatOrderByRelationAggregateInput
 }
 
 export type examenWhereUniqueInput = Prisma.AtLeast<{
@@ -214,9 +214,9 @@ export type examenWhereUniqueInput = Prisma.AtLeast<{
   heure?: Prisma.DateTimeNullableFilter<"examen"> | Date | string | null
   lieu?: Prisma.StringNullableFilter<"examen"> | string | null
   type_examen?: Prisma.StringNullableFilter<"examen"> | string | null
-  id_concours?: Prisma.StringFilter<"examen"> | string
+  id_concours?: Prisma.UuidFilter<"examen"> | string
   concours?: Prisma.XOR<Prisma.ConcoursScalarRelationFilter, Prisma.concoursWhereInput>
-  passer?: Prisma.PasserListRelationFilter
+  resultat?: Prisma.ResultatListRelationFilter
 }, "id_examen">
 
 export type examenOrderByWithAggregationInput = {
@@ -235,32 +235,32 @@ export type examenScalarWhereWithAggregatesInput = {
   AND?: Prisma.examenScalarWhereWithAggregatesInput | Prisma.examenScalarWhereWithAggregatesInput[]
   OR?: Prisma.examenScalarWhereWithAggregatesInput[]
   NOT?: Prisma.examenScalarWhereWithAggregatesInput | Prisma.examenScalarWhereWithAggregatesInput[]
-  id_examen?: Prisma.StringWithAggregatesFilter<"examen"> | string
+  id_examen?: Prisma.UuidWithAggregatesFilter<"examen"> | string
   date_examen?: Prisma.DateTimeWithAggregatesFilter<"examen"> | Date | string
   heure?: Prisma.DateTimeNullableWithAggregatesFilter<"examen"> | Date | string | null
   lieu?: Prisma.StringNullableWithAggregatesFilter<"examen"> | string | null
   type_examen?: Prisma.StringNullableWithAggregatesFilter<"examen"> | string | null
-  id_concours?: Prisma.StringWithAggregatesFilter<"examen"> | string
+  id_concours?: Prisma.UuidWithAggregatesFilter<"examen"> | string
 }
 
 export type examenCreateInput = {
-  id_examen: string
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
   type_examen?: string | null
   concours: Prisma.concoursCreateNestedOneWithoutExamenInput
-  passer?: Prisma.passerCreateNestedManyWithoutExamenInput
+  resultat?: Prisma.resultatCreateNestedManyWithoutExamenInput
 }
 
 export type examenUncheckedCreateInput = {
-  id_examen: string
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
   type_examen?: string | null
   id_concours: string
-  passer?: Prisma.passerUncheckedCreateNestedManyWithoutExamenInput
+  resultat?: Prisma.resultatUncheckedCreateNestedManyWithoutExamenInput
 }
 
 export type examenUpdateInput = {
@@ -270,7 +270,7 @@ export type examenUpdateInput = {
   lieu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type_examen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   concours?: Prisma.concoursUpdateOneRequiredWithoutExamenNestedInput
-  passer?: Prisma.passerUpdateManyWithoutExamenNestedInput
+  resultat?: Prisma.resultatUpdateManyWithoutExamenNestedInput
 }
 
 export type examenUncheckedUpdateInput = {
@@ -280,11 +280,11 @@ export type examenUncheckedUpdateInput = {
   lieu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type_examen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
-  passer?: Prisma.passerUncheckedUpdateManyWithoutExamenNestedInput
+  resultat?: Prisma.resultatUncheckedUpdateManyWithoutExamenNestedInput
 }
 
 export type examenCreateManyInput = {
-  id_examen: string
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
@@ -393,36 +393,36 @@ export type examenUncheckedUpdateManyWithoutConcoursNestedInput = {
   deleteMany?: Prisma.examenScalarWhereInput | Prisma.examenScalarWhereInput[]
 }
 
-export type examenCreateNestedOneWithoutPasserInput = {
-  create?: Prisma.XOR<Prisma.examenCreateWithoutPasserInput, Prisma.examenUncheckedCreateWithoutPasserInput>
-  connectOrCreate?: Prisma.examenCreateOrConnectWithoutPasserInput
+export type examenCreateNestedOneWithoutResultatInput = {
+  create?: Prisma.XOR<Prisma.examenCreateWithoutResultatInput, Prisma.examenUncheckedCreateWithoutResultatInput>
+  connectOrCreate?: Prisma.examenCreateOrConnectWithoutResultatInput
   connect?: Prisma.examenWhereUniqueInput
 }
 
-export type examenUpdateOneRequiredWithoutPasserNestedInput = {
-  create?: Prisma.XOR<Prisma.examenCreateWithoutPasserInput, Prisma.examenUncheckedCreateWithoutPasserInput>
-  connectOrCreate?: Prisma.examenCreateOrConnectWithoutPasserInput
-  upsert?: Prisma.examenUpsertWithoutPasserInput
+export type examenUpdateOneRequiredWithoutResultatNestedInput = {
+  create?: Prisma.XOR<Prisma.examenCreateWithoutResultatInput, Prisma.examenUncheckedCreateWithoutResultatInput>
+  connectOrCreate?: Prisma.examenCreateOrConnectWithoutResultatInput
+  upsert?: Prisma.examenUpsertWithoutResultatInput
   connect?: Prisma.examenWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.examenUpdateToOneWithWhereWithoutPasserInput, Prisma.examenUpdateWithoutPasserInput>, Prisma.examenUncheckedUpdateWithoutPasserInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.examenUpdateToOneWithWhereWithoutResultatInput, Prisma.examenUpdateWithoutResultatInput>, Prisma.examenUncheckedUpdateWithoutResultatInput>
 }
 
 export type examenCreateWithoutConcoursInput = {
-  id_examen: string
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
   type_examen?: string | null
-  passer?: Prisma.passerCreateNestedManyWithoutExamenInput
+  resultat?: Prisma.resultatCreateNestedManyWithoutExamenInput
 }
 
 export type examenUncheckedCreateWithoutConcoursInput = {
-  id_examen: string
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
   type_examen?: string | null
-  passer?: Prisma.passerUncheckedCreateNestedManyWithoutExamenInput
+  resultat?: Prisma.resultatUncheckedCreateNestedManyWithoutExamenInput
 }
 
 export type examenCreateOrConnectWithoutConcoursInput = {
@@ -455,16 +455,16 @@ export type examenScalarWhereInput = {
   AND?: Prisma.examenScalarWhereInput | Prisma.examenScalarWhereInput[]
   OR?: Prisma.examenScalarWhereInput[]
   NOT?: Prisma.examenScalarWhereInput | Prisma.examenScalarWhereInput[]
-  id_examen?: Prisma.StringFilter<"examen"> | string
+  id_examen?: Prisma.UuidFilter<"examen"> | string
   date_examen?: Prisma.DateTimeFilter<"examen"> | Date | string
   heure?: Prisma.DateTimeNullableFilter<"examen"> | Date | string | null
   lieu?: Prisma.StringNullableFilter<"examen"> | string | null
   type_examen?: Prisma.StringNullableFilter<"examen"> | string | null
-  id_concours?: Prisma.StringFilter<"examen"> | string
+  id_concours?: Prisma.UuidFilter<"examen"> | string
 }
 
-export type examenCreateWithoutPasserInput = {
-  id_examen: string
+export type examenCreateWithoutResultatInput = {
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
@@ -472,8 +472,8 @@ export type examenCreateWithoutPasserInput = {
   concours: Prisma.concoursCreateNestedOneWithoutExamenInput
 }
 
-export type examenUncheckedCreateWithoutPasserInput = {
-  id_examen: string
+export type examenUncheckedCreateWithoutResultatInput = {
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
@@ -481,23 +481,23 @@ export type examenUncheckedCreateWithoutPasserInput = {
   id_concours: string
 }
 
-export type examenCreateOrConnectWithoutPasserInput = {
+export type examenCreateOrConnectWithoutResultatInput = {
   where: Prisma.examenWhereUniqueInput
-  create: Prisma.XOR<Prisma.examenCreateWithoutPasserInput, Prisma.examenUncheckedCreateWithoutPasserInput>
+  create: Prisma.XOR<Prisma.examenCreateWithoutResultatInput, Prisma.examenUncheckedCreateWithoutResultatInput>
 }
 
-export type examenUpsertWithoutPasserInput = {
-  update: Prisma.XOR<Prisma.examenUpdateWithoutPasserInput, Prisma.examenUncheckedUpdateWithoutPasserInput>
-  create: Prisma.XOR<Prisma.examenCreateWithoutPasserInput, Prisma.examenUncheckedCreateWithoutPasserInput>
+export type examenUpsertWithoutResultatInput = {
+  update: Prisma.XOR<Prisma.examenUpdateWithoutResultatInput, Prisma.examenUncheckedUpdateWithoutResultatInput>
+  create: Prisma.XOR<Prisma.examenCreateWithoutResultatInput, Prisma.examenUncheckedCreateWithoutResultatInput>
   where?: Prisma.examenWhereInput
 }
 
-export type examenUpdateToOneWithWhereWithoutPasserInput = {
+export type examenUpdateToOneWithWhereWithoutResultatInput = {
   where?: Prisma.examenWhereInput
-  data: Prisma.XOR<Prisma.examenUpdateWithoutPasserInput, Prisma.examenUncheckedUpdateWithoutPasserInput>
+  data: Prisma.XOR<Prisma.examenUpdateWithoutResultatInput, Prisma.examenUncheckedUpdateWithoutResultatInput>
 }
 
-export type examenUpdateWithoutPasserInput = {
+export type examenUpdateWithoutResultatInput = {
   id_examen?: Prisma.StringFieldUpdateOperationsInput | string
   date_examen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   heure?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -506,7 +506,7 @@ export type examenUpdateWithoutPasserInput = {
   concours?: Prisma.concoursUpdateOneRequiredWithoutExamenNestedInput
 }
 
-export type examenUncheckedUpdateWithoutPasserInput = {
+export type examenUncheckedUpdateWithoutResultatInput = {
   id_examen?: Prisma.StringFieldUpdateOperationsInput | string
   date_examen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   heure?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -516,7 +516,7 @@ export type examenUncheckedUpdateWithoutPasserInput = {
 }
 
 export type examenCreateManyConcoursInput = {
-  id_examen: string
+  id_examen?: string
   date_examen: Date | string
   heure?: Date | string | null
   lieu?: string | null
@@ -529,7 +529,7 @@ export type examenUpdateWithoutConcoursInput = {
   heure?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lieu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type_examen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passer?: Prisma.passerUpdateManyWithoutExamenNestedInput
+  resultat?: Prisma.resultatUpdateManyWithoutExamenNestedInput
 }
 
 export type examenUncheckedUpdateWithoutConcoursInput = {
@@ -538,7 +538,7 @@ export type examenUncheckedUpdateWithoutConcoursInput = {
   heure?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lieu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type_examen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passer?: Prisma.passerUncheckedUpdateManyWithoutExamenNestedInput
+  resultat?: Prisma.resultatUncheckedUpdateManyWithoutExamenNestedInput
 }
 
 export type examenUncheckedUpdateManyWithoutConcoursInput = {
@@ -555,11 +555,11 @@ export type examenUncheckedUpdateManyWithoutConcoursInput = {
  */
 
 export type ExamenCountOutputType = {
-  passer: number
+  resultat: number
 }
 
 export type ExamenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  passer?: boolean | ExamenCountOutputTypeCountPasserArgs
+  resultat?: boolean | ExamenCountOutputTypeCountResultatArgs
 }
 
 /**
@@ -575,8 +575,8 @@ export type ExamenCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
 /**
  * ExamenCountOutputType without action
  */
-export type ExamenCountOutputTypeCountPasserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.passerWhereInput
+export type ExamenCountOutputTypeCountResultatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.resultatWhereInput
 }
 
 
@@ -588,7 +588,7 @@ export type examenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   type_examen?: boolean
   id_concours?: boolean
   concours?: boolean | Prisma.concoursDefaultArgs<ExtArgs>
-  passer?: boolean | Prisma.examen$passerArgs<ExtArgs>
+  resultat?: boolean | Prisma.examen$resultatArgs<ExtArgs>
   _count?: boolean | Prisma.ExamenCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["examen"]>
 
@@ -624,7 +624,7 @@ export type examenSelectScalar = {
 export type examenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_examen" | "date_examen" | "heure" | "lieu" | "type_examen" | "id_concours", ExtArgs["result"]["examen"]>
 export type examenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   concours?: boolean | Prisma.concoursDefaultArgs<ExtArgs>
-  passer?: boolean | Prisma.examen$passerArgs<ExtArgs>
+  resultat?: boolean | Prisma.examen$resultatArgs<ExtArgs>
   _count?: boolean | Prisma.ExamenCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type examenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -638,7 +638,7 @@ export type $examenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "examen"
   objects: {
     concours: Prisma.$concoursPayload<ExtArgs>
-    passer: Prisma.$passerPayload<ExtArgs>[]
+    resultat: Prisma.$resultatPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_examen: string
@@ -1042,7 +1042,7 @@ readonly fields: examenFieldRefs;
 export interface Prisma__examenClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   concours<T extends Prisma.concoursDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.concoursDefaultArgs<ExtArgs>>): Prisma.Prisma__concoursClient<runtime.Types.Result.GetResult<Prisma.$concoursPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  passer<T extends Prisma.examen$passerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.examen$passerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$passerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  resultat<T extends Prisma.examen$resultatArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.examen$resultatArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$resultatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1479,27 +1479,27 @@ export type examenDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * examen.passer
+ * examen.resultat
  */
-export type examen$passerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type examen$resultatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the passer
+   * Select specific fields to fetch from the resultat
    */
-  select?: Prisma.passerSelect<ExtArgs> | null
+  select?: Prisma.resultatSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the passer
+   * Omit specific fields from the resultat
    */
-  omit?: Prisma.passerOmit<ExtArgs> | null
+  omit?: Prisma.resultatOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.passerInclude<ExtArgs> | null
-  where?: Prisma.passerWhereInput
-  orderBy?: Prisma.passerOrderByWithRelationInput | Prisma.passerOrderByWithRelationInput[]
-  cursor?: Prisma.passerWhereUniqueInput
+  include?: Prisma.resultatInclude<ExtArgs> | null
+  where?: Prisma.resultatWhereInput
+  orderBy?: Prisma.resultatOrderByWithRelationInput | Prisma.resultatOrderByWithRelationInput[]
+  cursor?: Prisma.resultatWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.PasserScalarFieldEnum | Prisma.PasserScalarFieldEnum[]
+  distinct?: Prisma.ResultatScalarFieldEnum | Prisma.ResultatScalarFieldEnum[]
 }
 
 /**

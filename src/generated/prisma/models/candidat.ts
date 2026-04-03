@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model candidat
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * 
  */
 export type candidatModel = runtime.Types.Result.DefaultSelection<Prisma.$candidatPayload>
 
@@ -29,7 +29,7 @@ export type CandidatMinAggregateOutputType = {
   nom: string | null
   prenom: string | null
   nom_jeune_fille: string | null
-  sexe: string | null
+  sexe: $Enums.Sexe | null
   date_naissance: Date | null
   lieu_naissance: string | null
   pays_naissance: string | null
@@ -39,7 +39,7 @@ export type CandidatMinAggregateOutputType = {
   email: string | null
   mot_de_passe: string | null
   recepisse: string | null
-  statut_compte: string | null
+  statut_compte: $Enums.StatutCompte | null
   date_creation: Date | null
 }
 
@@ -48,7 +48,7 @@ export type CandidatMaxAggregateOutputType = {
   nom: string | null
   prenom: string | null
   nom_jeune_fille: string | null
-  sexe: string | null
+  sexe: $Enums.Sexe | null
   date_naissance: Date | null
   lieu_naissance: string | null
   pays_naissance: string | null
@@ -58,7 +58,7 @@ export type CandidatMaxAggregateOutputType = {
   email: string | null
   mot_de_passe: string | null
   recepisse: string | null
-  statut_compte: string | null
+  statut_compte: $Enums.StatutCompte | null
   date_creation: Date | null
 }
 
@@ -218,7 +218,7 @@ export type CandidatGroupByOutputType = {
   nom: string
   prenom: string
   nom_jeune_fille: string | null
-  sexe: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date
   lieu_naissance: string | null
   pays_naissance: string | null
@@ -228,8 +228,8 @@ export type CandidatGroupByOutputType = {
   email: string
   mot_de_passe: string
   recepisse: string | null
-  statut_compte: string | null
-  date_creation: Date | null
+  statut_compte: $Enums.StatutCompte
+  date_creation: Date
   _count: CandidatCountAggregateOutputType | null
   _min: CandidatMinAggregateOutputType | null
   _max: CandidatMaxAggregateOutputType | null
@@ -254,11 +254,11 @@ export type candidatWhereInput = {
   AND?: Prisma.candidatWhereInput | Prisma.candidatWhereInput[]
   OR?: Prisma.candidatWhereInput[]
   NOT?: Prisma.candidatWhereInput | Prisma.candidatWhereInput[]
-  id_candidat?: Prisma.StringFilter<"candidat"> | string
+  id_candidat?: Prisma.UuidFilter<"candidat"> | string
   nom?: Prisma.StringFilter<"candidat"> | string
   prenom?: Prisma.StringFilter<"candidat"> | string
   nom_jeune_fille?: Prisma.StringNullableFilter<"candidat"> | string | null
-  sexe?: Prisma.StringNullableFilter<"candidat"> | string | null
+  sexe?: Prisma.EnumSexeFilter<"candidat"> | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFilter<"candidat"> | Date | string
   lieu_naissance?: Prisma.StringNullableFilter<"candidat"> | string | null
   pays_naissance?: Prisma.StringNullableFilter<"candidat"> | string | null
@@ -268,12 +268,12 @@ export type candidatWhereInput = {
   email?: Prisma.StringFilter<"candidat"> | string
   mot_de_passe?: Prisma.StringFilter<"candidat"> | string
   recepisse?: Prisma.StringNullableFilter<"candidat"> | string | null
-  statut_compte?: Prisma.StringNullableFilter<"candidat"> | string | null
-  date_creation?: Prisma.DateTimeNullableFilter<"candidat"> | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFilter<"candidat"> | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFilter<"candidat"> | Date | string
   candidat_professionnel?: Prisma.XOR<Prisma.Candidat_professionnelNullableScalarRelationFilter, Prisma.candidat_professionnelWhereInput> | null
   document?: Prisma.DocumentListRelationFilter
   inscription?: Prisma.InscriptionListRelationFilter
-  passer?: Prisma.PasserListRelationFilter
+  resultat?: Prisma.ResultatListRelationFilter
 }
 
 export type candidatOrderByWithRelationInput = {
@@ -281,7 +281,7 @@ export type candidatOrderByWithRelationInput = {
   nom?: Prisma.SortOrder
   prenom?: Prisma.SortOrder
   nom_jeune_fille?: Prisma.SortOrderInput | Prisma.SortOrder
-  sexe?: Prisma.SortOrderInput | Prisma.SortOrder
+  sexe?: Prisma.SortOrder
   date_naissance?: Prisma.SortOrder
   lieu_naissance?: Prisma.SortOrderInput | Prisma.SortOrder
   pays_naissance?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -291,12 +291,12 @@ export type candidatOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   mot_de_passe?: Prisma.SortOrder
   recepisse?: Prisma.SortOrderInput | Prisma.SortOrder
-  statut_compte?: Prisma.SortOrderInput | Prisma.SortOrder
-  date_creation?: Prisma.SortOrderInput | Prisma.SortOrder
+  statut_compte?: Prisma.SortOrder
+  date_creation?: Prisma.SortOrder
   candidat_professionnel?: Prisma.candidat_professionnelOrderByWithRelationInput
   document?: Prisma.documentOrderByRelationAggregateInput
   inscription?: Prisma.inscriptionOrderByRelationAggregateInput
-  passer?: Prisma.passerOrderByRelationAggregateInput
+  resultat?: Prisma.resultatOrderByRelationAggregateInput
 }
 
 export type candidatWhereUniqueInput = Prisma.AtLeast<{
@@ -309,7 +309,7 @@ export type candidatWhereUniqueInput = Prisma.AtLeast<{
   nom?: Prisma.StringFilter<"candidat"> | string
   prenom?: Prisma.StringFilter<"candidat"> | string
   nom_jeune_fille?: Prisma.StringNullableFilter<"candidat"> | string | null
-  sexe?: Prisma.StringNullableFilter<"candidat"> | string | null
+  sexe?: Prisma.EnumSexeFilter<"candidat"> | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFilter<"candidat"> | Date | string
   lieu_naissance?: Prisma.StringNullableFilter<"candidat"> | string | null
   pays_naissance?: Prisma.StringNullableFilter<"candidat"> | string | null
@@ -317,12 +317,12 @@ export type candidatWhereUniqueInput = Prisma.AtLeast<{
   telephone?: Prisma.StringNullableFilter<"candidat"> | string | null
   mot_de_passe?: Prisma.StringFilter<"candidat"> | string
   recepisse?: Prisma.StringNullableFilter<"candidat"> | string | null
-  statut_compte?: Prisma.StringNullableFilter<"candidat"> | string | null
-  date_creation?: Prisma.DateTimeNullableFilter<"candidat"> | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFilter<"candidat"> | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFilter<"candidat"> | Date | string
   candidat_professionnel?: Prisma.XOR<Prisma.Candidat_professionnelNullableScalarRelationFilter, Prisma.candidat_professionnelWhereInput> | null
   document?: Prisma.DocumentListRelationFilter
   inscription?: Prisma.InscriptionListRelationFilter
-  passer?: Prisma.PasserListRelationFilter
+  resultat?: Prisma.ResultatListRelationFilter
 }, "id_candidat" | "numero_cnib" | "email">
 
 export type candidatOrderByWithAggregationInput = {
@@ -330,7 +330,7 @@ export type candidatOrderByWithAggregationInput = {
   nom?: Prisma.SortOrder
   prenom?: Prisma.SortOrder
   nom_jeune_fille?: Prisma.SortOrderInput | Prisma.SortOrder
-  sexe?: Prisma.SortOrderInput | Prisma.SortOrder
+  sexe?: Prisma.SortOrder
   date_naissance?: Prisma.SortOrder
   lieu_naissance?: Prisma.SortOrderInput | Prisma.SortOrder
   pays_naissance?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -340,8 +340,8 @@ export type candidatOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   mot_de_passe?: Prisma.SortOrder
   recepisse?: Prisma.SortOrderInput | Prisma.SortOrder
-  statut_compte?: Prisma.SortOrderInput | Prisma.SortOrder
-  date_creation?: Prisma.SortOrderInput | Prisma.SortOrder
+  statut_compte?: Prisma.SortOrder
+  date_creation?: Prisma.SortOrder
   _count?: Prisma.candidatCountOrderByAggregateInput
   _max?: Prisma.candidatMaxOrderByAggregateInput
   _min?: Prisma.candidatMinOrderByAggregateInput
@@ -351,11 +351,11 @@ export type candidatScalarWhereWithAggregatesInput = {
   AND?: Prisma.candidatScalarWhereWithAggregatesInput | Prisma.candidatScalarWhereWithAggregatesInput[]
   OR?: Prisma.candidatScalarWhereWithAggregatesInput[]
   NOT?: Prisma.candidatScalarWhereWithAggregatesInput | Prisma.candidatScalarWhereWithAggregatesInput[]
-  id_candidat?: Prisma.StringWithAggregatesFilter<"candidat"> | string
+  id_candidat?: Prisma.UuidWithAggregatesFilter<"candidat"> | string
   nom?: Prisma.StringWithAggregatesFilter<"candidat"> | string
   prenom?: Prisma.StringWithAggregatesFilter<"candidat"> | string
   nom_jeune_fille?: Prisma.StringNullableWithAggregatesFilter<"candidat"> | string | null
-  sexe?: Prisma.StringNullableWithAggregatesFilter<"candidat"> | string | null
+  sexe?: Prisma.EnumSexeWithAggregatesFilter<"candidat"> | $Enums.Sexe
   date_naissance?: Prisma.DateTimeWithAggregatesFilter<"candidat"> | Date | string
   lieu_naissance?: Prisma.StringNullableWithAggregatesFilter<"candidat"> | string | null
   pays_naissance?: Prisma.StringNullableWithAggregatesFilter<"candidat"> | string | null
@@ -365,16 +365,16 @@ export type candidatScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"candidat"> | string
   mot_de_passe?: Prisma.StringWithAggregatesFilter<"candidat"> | string
   recepisse?: Prisma.StringNullableWithAggregatesFilter<"candidat"> | string | null
-  statut_compte?: Prisma.StringNullableWithAggregatesFilter<"candidat"> | string | null
-  date_creation?: Prisma.DateTimeNullableWithAggregatesFilter<"candidat"> | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteWithAggregatesFilter<"candidat"> | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeWithAggregatesFilter<"candidat"> | Date | string
 }
 
 export type candidatCreateInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -384,20 +384,20 @@ export type candidatCreateInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelCreateNestedOneWithoutCandidatInput
   document?: Prisma.documentCreateNestedManyWithoutCandidatInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatUncheckedCreateInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -407,12 +407,12 @@ export type candidatUncheckedCreateInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedCreateNestedOneWithoutCandidatInput
   document?: Prisma.documentUncheckedCreateNestedManyWithoutCandidatInput
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerUncheckedCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatUncheckedCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatUpdateInput = {
@@ -420,7 +420,7 @@ export type candidatUpdateInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -430,12 +430,12 @@ export type candidatUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUpdateOneWithoutCandidatNestedInput
   document?: Prisma.documentUpdateManyWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatUncheckedUpdateInput = {
@@ -443,7 +443,7 @@ export type candidatUncheckedUpdateInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -453,20 +453,20 @@ export type candidatUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedUpdateOneWithoutCandidatNestedInput
   document?: Prisma.documentUncheckedUpdateManyWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUncheckedUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUncheckedUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatCreateManyInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -476,8 +476,8 @@ export type candidatCreateManyInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
 }
 
 export type candidatUpdateManyMutationInput = {
@@ -485,7 +485,7 @@ export type candidatUpdateManyMutationInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -495,8 +495,8 @@ export type candidatUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type candidatUncheckedUpdateManyInput = {
@@ -504,7 +504,7 @@ export type candidatUncheckedUpdateManyInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -514,8 +514,8 @@ export type candidatUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type candidatCountOrderByAggregateInput = {
@@ -580,8 +580,16 @@ export type CandidatScalarRelationFilter = {
   isNot?: Prisma.candidatWhereInput
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
+export type EnumSexeFieldUpdateOperationsInput = {
+  set?: $Enums.Sexe
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type EnumStatutCompteFieldUpdateOperationsInput = {
+  set?: $Enums.StatutCompte
 }
 
 export type candidatCreateNestedOneWithoutCandidat_professionnelInput = {
@@ -626,26 +634,26 @@ export type candidatUpdateOneRequiredWithoutInscriptionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.candidatUpdateToOneWithWhereWithoutInscriptionInput, Prisma.candidatUpdateWithoutInscriptionInput>, Prisma.candidatUncheckedUpdateWithoutInscriptionInput>
 }
 
-export type candidatCreateNestedOneWithoutPasserInput = {
-  create?: Prisma.XOR<Prisma.candidatCreateWithoutPasserInput, Prisma.candidatUncheckedCreateWithoutPasserInput>
-  connectOrCreate?: Prisma.candidatCreateOrConnectWithoutPasserInput
+export type candidatCreateNestedOneWithoutResultatInput = {
+  create?: Prisma.XOR<Prisma.candidatCreateWithoutResultatInput, Prisma.candidatUncheckedCreateWithoutResultatInput>
+  connectOrCreate?: Prisma.candidatCreateOrConnectWithoutResultatInput
   connect?: Prisma.candidatWhereUniqueInput
 }
 
-export type candidatUpdateOneRequiredWithoutPasserNestedInput = {
-  create?: Prisma.XOR<Prisma.candidatCreateWithoutPasserInput, Prisma.candidatUncheckedCreateWithoutPasserInput>
-  connectOrCreate?: Prisma.candidatCreateOrConnectWithoutPasserInput
-  upsert?: Prisma.candidatUpsertWithoutPasserInput
+export type candidatUpdateOneRequiredWithoutResultatNestedInput = {
+  create?: Prisma.XOR<Prisma.candidatCreateWithoutResultatInput, Prisma.candidatUncheckedCreateWithoutResultatInput>
+  connectOrCreate?: Prisma.candidatCreateOrConnectWithoutResultatInput
+  upsert?: Prisma.candidatUpsertWithoutResultatInput
   connect?: Prisma.candidatWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.candidatUpdateToOneWithWhereWithoutPasserInput, Prisma.candidatUpdateWithoutPasserInput>, Prisma.candidatUncheckedUpdateWithoutPasserInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.candidatUpdateToOneWithWhereWithoutResultatInput, Prisma.candidatUpdateWithoutResultatInput>, Prisma.candidatUncheckedUpdateWithoutResultatInput>
 }
 
 export type candidatCreateWithoutCandidat_professionnelInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -655,19 +663,19 @@ export type candidatCreateWithoutCandidat_professionnelInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   document?: Prisma.documentCreateNestedManyWithoutCandidatInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatUncheckedCreateWithoutCandidat_professionnelInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -677,11 +685,11 @@ export type candidatUncheckedCreateWithoutCandidat_professionnelInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   document?: Prisma.documentUncheckedCreateNestedManyWithoutCandidatInput
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerUncheckedCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatUncheckedCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatCreateOrConnectWithoutCandidat_professionnelInput = {
@@ -705,7 +713,7 @@ export type candidatUpdateWithoutCandidat_professionnelInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -715,11 +723,11 @@ export type candidatUpdateWithoutCandidat_professionnelInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.documentUpdateManyWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatUncheckedUpdateWithoutCandidat_professionnelInput = {
@@ -727,7 +735,7 @@ export type candidatUncheckedUpdateWithoutCandidat_professionnelInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -737,19 +745,19 @@ export type candidatUncheckedUpdateWithoutCandidat_professionnelInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.documentUncheckedUpdateManyWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUncheckedUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUncheckedUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatCreateWithoutDocumentInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -759,19 +767,19 @@ export type candidatCreateWithoutDocumentInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelCreateNestedOneWithoutCandidatInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatUncheckedCreateWithoutDocumentInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -781,11 +789,11 @@ export type candidatUncheckedCreateWithoutDocumentInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedCreateNestedOneWithoutCandidatInput
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerUncheckedCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatUncheckedCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatCreateOrConnectWithoutDocumentInput = {
@@ -809,7 +817,7 @@ export type candidatUpdateWithoutDocumentInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -819,11 +827,11 @@ export type candidatUpdateWithoutDocumentInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUpdateOneWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatUncheckedUpdateWithoutDocumentInput = {
@@ -831,7 +839,7 @@ export type candidatUncheckedUpdateWithoutDocumentInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -841,19 +849,19 @@ export type candidatUncheckedUpdateWithoutDocumentInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedUpdateOneWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUncheckedUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUncheckedUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatCreateWithoutInscriptionInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -863,19 +871,19 @@ export type candidatCreateWithoutInscriptionInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelCreateNestedOneWithoutCandidatInput
   document?: Prisma.documentCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatUncheckedCreateWithoutInscriptionInput = {
-  id_candidat: string
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -885,11 +893,11 @@ export type candidatUncheckedCreateWithoutInscriptionInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedCreateNestedOneWithoutCandidatInput
   document?: Prisma.documentUncheckedCreateNestedManyWithoutCandidatInput
-  passer?: Prisma.passerUncheckedCreateNestedManyWithoutCandidatInput
+  resultat?: Prisma.resultatUncheckedCreateNestedManyWithoutCandidatInput
 }
 
 export type candidatCreateOrConnectWithoutInscriptionInput = {
@@ -913,7 +921,7 @@ export type candidatUpdateWithoutInscriptionInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -923,11 +931,11 @@ export type candidatUpdateWithoutInscriptionInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUpdateOneWithoutCandidatNestedInput
   document?: Prisma.documentUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUpdateManyWithoutCandidatNestedInput
 }
 
 export type candidatUncheckedUpdateWithoutInscriptionInput = {
@@ -935,7 +943,7 @@ export type candidatUncheckedUpdateWithoutInscriptionInput = {
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -945,19 +953,19 @@ export type candidatUncheckedUpdateWithoutInscriptionInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedUpdateOneWithoutCandidatNestedInput
   document?: Prisma.documentUncheckedUpdateManyWithoutCandidatNestedInput
-  passer?: Prisma.passerUncheckedUpdateManyWithoutCandidatNestedInput
+  resultat?: Prisma.resultatUncheckedUpdateManyWithoutCandidatNestedInput
 }
 
-export type candidatCreateWithoutPasserInput = {
-  id_candidat: string
+export type candidatCreateWithoutResultatInput = {
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -967,19 +975,19 @@ export type candidatCreateWithoutPasserInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelCreateNestedOneWithoutCandidatInput
   document?: Prisma.documentCreateNestedManyWithoutCandidatInput
   inscription?: Prisma.inscriptionCreateNestedManyWithoutCandidatInput
 }
 
-export type candidatUncheckedCreateWithoutPasserInput = {
-  id_candidat: string
+export type candidatUncheckedCreateWithoutResultatInput = {
+  id_candidat?: string
   nom: string
   prenom: string
   nom_jeune_fille?: string | null
-  sexe?: string | null
+  sexe: $Enums.Sexe
   date_naissance: Date | string
   lieu_naissance?: string | null
   pays_naissance?: string | null
@@ -989,35 +997,35 @@ export type candidatUncheckedCreateWithoutPasserInput = {
   email: string
   mot_de_passe: string
   recepisse?: string | null
-  statut_compte?: string | null
-  date_creation?: Date | string | null
+  statut_compte?: $Enums.StatutCompte
+  date_creation?: Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedCreateNestedOneWithoutCandidatInput
   document?: Prisma.documentUncheckedCreateNestedManyWithoutCandidatInput
   inscription?: Prisma.inscriptionUncheckedCreateNestedManyWithoutCandidatInput
 }
 
-export type candidatCreateOrConnectWithoutPasserInput = {
+export type candidatCreateOrConnectWithoutResultatInput = {
   where: Prisma.candidatWhereUniqueInput
-  create: Prisma.XOR<Prisma.candidatCreateWithoutPasserInput, Prisma.candidatUncheckedCreateWithoutPasserInput>
+  create: Prisma.XOR<Prisma.candidatCreateWithoutResultatInput, Prisma.candidatUncheckedCreateWithoutResultatInput>
 }
 
-export type candidatUpsertWithoutPasserInput = {
-  update: Prisma.XOR<Prisma.candidatUpdateWithoutPasserInput, Prisma.candidatUncheckedUpdateWithoutPasserInput>
-  create: Prisma.XOR<Prisma.candidatCreateWithoutPasserInput, Prisma.candidatUncheckedCreateWithoutPasserInput>
+export type candidatUpsertWithoutResultatInput = {
+  update: Prisma.XOR<Prisma.candidatUpdateWithoutResultatInput, Prisma.candidatUncheckedUpdateWithoutResultatInput>
+  create: Prisma.XOR<Prisma.candidatCreateWithoutResultatInput, Prisma.candidatUncheckedCreateWithoutResultatInput>
   where?: Prisma.candidatWhereInput
 }
 
-export type candidatUpdateToOneWithWhereWithoutPasserInput = {
+export type candidatUpdateToOneWithWhereWithoutResultatInput = {
   where?: Prisma.candidatWhereInput
-  data: Prisma.XOR<Prisma.candidatUpdateWithoutPasserInput, Prisma.candidatUncheckedUpdateWithoutPasserInput>
+  data: Prisma.XOR<Prisma.candidatUpdateWithoutResultatInput, Prisma.candidatUncheckedUpdateWithoutResultatInput>
 }
 
-export type candidatUpdateWithoutPasserInput = {
+export type candidatUpdateWithoutResultatInput = {
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1027,19 +1035,19 @@ export type candidatUpdateWithoutPasserInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUpdateOneWithoutCandidatNestedInput
   document?: Prisma.documentUpdateManyWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUpdateManyWithoutCandidatNestedInput
 }
 
-export type candidatUncheckedUpdateWithoutPasserInput = {
+export type candidatUncheckedUpdateWithoutResultatInput = {
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
   nom?: Prisma.StringFieldUpdateOperationsInput | string
   prenom?: Prisma.StringFieldUpdateOperationsInput | string
   nom_jeune_fille?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sexe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sexe?: Prisma.EnumSexeFieldUpdateOperationsInput | $Enums.Sexe
   date_naissance?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lieu_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pays_naissance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1049,8 +1057,8 @@ export type candidatUncheckedUpdateWithoutPasserInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   mot_de_passe?: Prisma.StringFieldUpdateOperationsInput | string
   recepisse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statut_compte?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date_creation?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statut_compte?: Prisma.EnumStatutCompteFieldUpdateOperationsInput | $Enums.StatutCompte
+  date_creation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat_professionnel?: Prisma.candidat_professionnelUncheckedUpdateOneWithoutCandidatNestedInput
   document?: Prisma.documentUncheckedUpdateManyWithoutCandidatNestedInput
   inscription?: Prisma.inscriptionUncheckedUpdateManyWithoutCandidatNestedInput
@@ -1064,13 +1072,13 @@ export type candidatUncheckedUpdateWithoutPasserInput = {
 export type CandidatCountOutputType = {
   document: number
   inscription: number
-  passer: number
+  resultat: number
 }
 
 export type CandidatCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   document?: boolean | CandidatCountOutputTypeCountDocumentArgs
   inscription?: boolean | CandidatCountOutputTypeCountInscriptionArgs
-  passer?: boolean | CandidatCountOutputTypeCountPasserArgs
+  resultat?: boolean | CandidatCountOutputTypeCountResultatArgs
 }
 
 /**
@@ -1100,8 +1108,8 @@ export type CandidatCountOutputTypeCountInscriptionArgs<ExtArgs extends runtime.
 /**
  * CandidatCountOutputType without action
  */
-export type CandidatCountOutputTypeCountPasserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.passerWhereInput
+export type CandidatCountOutputTypeCountResultatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.resultatWhereInput
 }
 
 
@@ -1125,7 +1133,7 @@ export type candidatSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   candidat_professionnel?: boolean | Prisma.candidat$candidat_professionnelArgs<ExtArgs>
   document?: boolean | Prisma.candidat$documentArgs<ExtArgs>
   inscription?: boolean | Prisma.candidat$inscriptionArgs<ExtArgs>
-  passer?: boolean | Prisma.candidat$passerArgs<ExtArgs>
+  resultat?: boolean | Prisma.candidat$resultatArgs<ExtArgs>
   _count?: boolean | Prisma.CandidatCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["candidat"]>
 
@@ -1191,7 +1199,7 @@ export type candidatInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   candidat_professionnel?: boolean | Prisma.candidat$candidat_professionnelArgs<ExtArgs>
   document?: boolean | Prisma.candidat$documentArgs<ExtArgs>
   inscription?: boolean | Prisma.candidat$inscriptionArgs<ExtArgs>
-  passer?: boolean | Prisma.candidat$passerArgs<ExtArgs>
+  resultat?: boolean | Prisma.candidat$resultatArgs<ExtArgs>
   _count?: boolean | Prisma.CandidatCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type candidatIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1203,14 +1211,14 @@ export type $candidatPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     candidat_professionnel: Prisma.$candidat_professionnelPayload<ExtArgs> | null
     document: Prisma.$documentPayload<ExtArgs>[]
     inscription: Prisma.$inscriptionPayload<ExtArgs>[]
-    passer: Prisma.$passerPayload<ExtArgs>[]
+    resultat: Prisma.$resultatPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_candidat: string
     nom: string
     prenom: string
     nom_jeune_fille: string | null
-    sexe: string | null
+    sexe: $Enums.Sexe
     date_naissance: Date
     lieu_naissance: string | null
     pays_naissance: string | null
@@ -1220,8 +1228,8 @@ export type $candidatPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     email: string
     mot_de_passe: string
     recepisse: string | null
-    statut_compte: string | null
-    date_creation: Date | null
+    statut_compte: $Enums.StatutCompte
+    date_creation: Date
   }, ExtArgs["result"]["candidat"]>
   composites: {}
 }
@@ -1619,7 +1627,7 @@ export interface Prisma__candidatClient<T, Null = never, ExtArgs extends runtime
   candidat_professionnel<T extends Prisma.candidat$candidat_professionnelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.candidat$candidat_professionnelArgs<ExtArgs>>): Prisma.Prisma__candidat_professionnelClient<runtime.Types.Result.GetResult<Prisma.$candidat_professionnelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   document<T extends Prisma.candidat$documentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.candidat$documentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$documentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inscription<T extends Prisma.candidat$inscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.candidat$inscriptionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$inscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  passer<T extends Prisma.candidat$passerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.candidat$passerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$passerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  resultat<T extends Prisma.candidat$resultatArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.candidat$resultatArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$resultatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1653,7 +1661,7 @@ export interface candidatFieldRefs {
   readonly nom: Prisma.FieldRef<"candidat", 'String'>
   readonly prenom: Prisma.FieldRef<"candidat", 'String'>
   readonly nom_jeune_fille: Prisma.FieldRef<"candidat", 'String'>
-  readonly sexe: Prisma.FieldRef<"candidat", 'String'>
+  readonly sexe: Prisma.FieldRef<"candidat", 'Sexe'>
   readonly date_naissance: Prisma.FieldRef<"candidat", 'DateTime'>
   readonly lieu_naissance: Prisma.FieldRef<"candidat", 'String'>
   readonly pays_naissance: Prisma.FieldRef<"candidat", 'String'>
@@ -1663,7 +1671,7 @@ export interface candidatFieldRefs {
   readonly email: Prisma.FieldRef<"candidat", 'String'>
   readonly mot_de_passe: Prisma.FieldRef<"candidat", 'String'>
   readonly recepisse: Prisma.FieldRef<"candidat", 'String'>
-  readonly statut_compte: Prisma.FieldRef<"candidat", 'String'>
+  readonly statut_compte: Prisma.FieldRef<"candidat", 'StatutCompte'>
   readonly date_creation: Prisma.FieldRef<"candidat", 'DateTime'>
 }
     
@@ -2125,27 +2133,27 @@ export type candidat$inscriptionArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
- * candidat.passer
+ * candidat.resultat
  */
-export type candidat$passerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type candidat$resultatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the passer
+   * Select specific fields to fetch from the resultat
    */
-  select?: Prisma.passerSelect<ExtArgs> | null
+  select?: Prisma.resultatSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the passer
+   * Omit specific fields from the resultat
    */
-  omit?: Prisma.passerOmit<ExtArgs> | null
+  omit?: Prisma.resultatOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.passerInclude<ExtArgs> | null
-  where?: Prisma.passerWhereInput
-  orderBy?: Prisma.passerOrderByWithRelationInput | Prisma.passerOrderByWithRelationInput[]
-  cursor?: Prisma.passerWhereUniqueInput
+  include?: Prisma.resultatInclude<ExtArgs> | null
+  where?: Prisma.resultatWhereInput
+  orderBy?: Prisma.resultatOrderByWithRelationInput | Prisma.resultatOrderByWithRelationInput[]
+  cursor?: Prisma.resultatWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.PasserScalarFieldEnum | Prisma.PasserScalarFieldEnum[]
+  distinct?: Prisma.ResultatScalarFieldEnum | Prisma.ResultatScalarFieldEnum[]
 }
 
 /**

@@ -149,8 +149,8 @@ export type inscriptionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type InscriptionGroupByOutputType = {
   id_inscription: string
-  date_inscription: Date | null
-  statut_inscription: string | null
+  date_inscription: Date
+  statut_inscription: string
   id_candidat: string
   id_concours: string
   _count: InscriptionCountAggregateOutputType | null
@@ -177,11 +177,11 @@ export type inscriptionWhereInput = {
   AND?: Prisma.inscriptionWhereInput | Prisma.inscriptionWhereInput[]
   OR?: Prisma.inscriptionWhereInput[]
   NOT?: Prisma.inscriptionWhereInput | Prisma.inscriptionWhereInput[]
-  id_inscription?: Prisma.StringFilter<"inscription"> | string
-  date_inscription?: Prisma.DateTimeNullableFilter<"inscription"> | Date | string | null
-  statut_inscription?: Prisma.StringNullableFilter<"inscription"> | string | null
-  id_candidat?: Prisma.StringFilter<"inscription"> | string
-  id_concours?: Prisma.StringFilter<"inscription"> | string
+  id_inscription?: Prisma.UuidFilter<"inscription"> | string
+  date_inscription?: Prisma.DateTimeFilter<"inscription"> | Date | string
+  statut_inscription?: Prisma.StringFilter<"inscription"> | string
+  id_candidat?: Prisma.UuidFilter<"inscription"> | string
+  id_concours?: Prisma.UuidFilter<"inscription"> | string
   candidat?: Prisma.XOR<Prisma.CandidatScalarRelationFilter, Prisma.candidatWhereInput>
   concours?: Prisma.XOR<Prisma.ConcoursScalarRelationFilter, Prisma.concoursWhereInput>
   paiement?: Prisma.PaiementListRelationFilter
@@ -189,8 +189,8 @@ export type inscriptionWhereInput = {
 
 export type inscriptionOrderByWithRelationInput = {
   id_inscription?: Prisma.SortOrder
-  date_inscription?: Prisma.SortOrderInput | Prisma.SortOrder
-  statut_inscription?: Prisma.SortOrderInput | Prisma.SortOrder
+  date_inscription?: Prisma.SortOrder
+  statut_inscription?: Prisma.SortOrder
   id_candidat?: Prisma.SortOrder
   id_concours?: Prisma.SortOrder
   candidat?: Prisma.candidatOrderByWithRelationInput
@@ -204,10 +204,10 @@ export type inscriptionWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.inscriptionWhereInput | Prisma.inscriptionWhereInput[]
   OR?: Prisma.inscriptionWhereInput[]
   NOT?: Prisma.inscriptionWhereInput | Prisma.inscriptionWhereInput[]
-  date_inscription?: Prisma.DateTimeNullableFilter<"inscription"> | Date | string | null
-  statut_inscription?: Prisma.StringNullableFilter<"inscription"> | string | null
-  id_candidat?: Prisma.StringFilter<"inscription"> | string
-  id_concours?: Prisma.StringFilter<"inscription"> | string
+  date_inscription?: Prisma.DateTimeFilter<"inscription"> | Date | string
+  statut_inscription?: Prisma.StringFilter<"inscription"> | string
+  id_candidat?: Prisma.UuidFilter<"inscription"> | string
+  id_concours?: Prisma.UuidFilter<"inscription"> | string
   candidat?: Prisma.XOR<Prisma.CandidatScalarRelationFilter, Prisma.candidatWhereInput>
   concours?: Prisma.XOR<Prisma.ConcoursScalarRelationFilter, Prisma.concoursWhereInput>
   paiement?: Prisma.PaiementListRelationFilter
@@ -215,8 +215,8 @@ export type inscriptionWhereUniqueInput = Prisma.AtLeast<{
 
 export type inscriptionOrderByWithAggregationInput = {
   id_inscription?: Prisma.SortOrder
-  date_inscription?: Prisma.SortOrderInput | Prisma.SortOrder
-  statut_inscription?: Prisma.SortOrderInput | Prisma.SortOrder
+  date_inscription?: Prisma.SortOrder
+  statut_inscription?: Prisma.SortOrder
   id_candidat?: Prisma.SortOrder
   id_concours?: Prisma.SortOrder
   _count?: Prisma.inscriptionCountOrderByAggregateInput
@@ -228,26 +228,26 @@ export type inscriptionScalarWhereWithAggregatesInput = {
   AND?: Prisma.inscriptionScalarWhereWithAggregatesInput | Prisma.inscriptionScalarWhereWithAggregatesInput[]
   OR?: Prisma.inscriptionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.inscriptionScalarWhereWithAggregatesInput | Prisma.inscriptionScalarWhereWithAggregatesInput[]
-  id_inscription?: Prisma.StringWithAggregatesFilter<"inscription"> | string
-  date_inscription?: Prisma.DateTimeNullableWithAggregatesFilter<"inscription"> | Date | string | null
-  statut_inscription?: Prisma.StringNullableWithAggregatesFilter<"inscription"> | string | null
-  id_candidat?: Prisma.StringWithAggregatesFilter<"inscription"> | string
-  id_concours?: Prisma.StringWithAggregatesFilter<"inscription"> | string
+  id_inscription?: Prisma.UuidWithAggregatesFilter<"inscription"> | string
+  date_inscription?: Prisma.DateTimeWithAggregatesFilter<"inscription"> | Date | string
+  statut_inscription?: Prisma.StringWithAggregatesFilter<"inscription"> | string
+  id_candidat?: Prisma.UuidWithAggregatesFilter<"inscription"> | string
+  id_concours?: Prisma.UuidWithAggregatesFilter<"inscription"> | string
 }
 
 export type inscriptionCreateInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   candidat: Prisma.candidatCreateNestedOneWithoutInscriptionInput
   concours: Prisma.concoursCreateNestedOneWithoutInscriptionInput
   paiement?: Prisma.paiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type inscriptionUncheckedCreateInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_candidat: string
   id_concours: string
   paiement?: Prisma.paiementUncheckedCreateNestedManyWithoutInscriptionInput
@@ -255,8 +255,8 @@ export type inscriptionUncheckedCreateInput = {
 
 export type inscriptionUpdateInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   candidat?: Prisma.candidatUpdateOneRequiredWithoutInscriptionNestedInput
   concours?: Prisma.concoursUpdateOneRequiredWithoutInscriptionNestedInput
   paiement?: Prisma.paiementUpdateManyWithoutInscriptionNestedInput
@@ -264,31 +264,31 @@ export type inscriptionUpdateInput = {
 
 export type inscriptionUncheckedUpdateInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   paiement?: Prisma.paiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type inscriptionCreateManyInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_candidat: string
   id_concours: string
 }
 
 export type inscriptionUpdateManyMutationInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type inscriptionUncheckedUpdateManyInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -436,17 +436,17 @@ export type inscriptionUpdateOneRequiredWithoutPaiementNestedInput = {
 }
 
 export type inscriptionCreateWithoutCandidatInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   concours: Prisma.concoursCreateNestedOneWithoutInscriptionInput
   paiement?: Prisma.paiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type inscriptionUncheckedCreateWithoutCandidatInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_concours: string
   paiement?: Prisma.paiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
@@ -481,25 +481,25 @@ export type inscriptionScalarWhereInput = {
   AND?: Prisma.inscriptionScalarWhereInput | Prisma.inscriptionScalarWhereInput[]
   OR?: Prisma.inscriptionScalarWhereInput[]
   NOT?: Prisma.inscriptionScalarWhereInput | Prisma.inscriptionScalarWhereInput[]
-  id_inscription?: Prisma.StringFilter<"inscription"> | string
-  date_inscription?: Prisma.DateTimeNullableFilter<"inscription"> | Date | string | null
-  statut_inscription?: Prisma.StringNullableFilter<"inscription"> | string | null
-  id_candidat?: Prisma.StringFilter<"inscription"> | string
-  id_concours?: Prisma.StringFilter<"inscription"> | string
+  id_inscription?: Prisma.UuidFilter<"inscription"> | string
+  date_inscription?: Prisma.DateTimeFilter<"inscription"> | Date | string
+  statut_inscription?: Prisma.StringFilter<"inscription"> | string
+  id_candidat?: Prisma.UuidFilter<"inscription"> | string
+  id_concours?: Prisma.UuidFilter<"inscription"> | string
 }
 
 export type inscriptionCreateWithoutConcoursInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   candidat: Prisma.candidatCreateNestedOneWithoutInscriptionInput
   paiement?: Prisma.paiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type inscriptionUncheckedCreateWithoutConcoursInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_candidat: string
   paiement?: Prisma.paiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
@@ -531,17 +531,17 @@ export type inscriptionUpdateManyWithWhereWithoutConcoursInput = {
 }
 
 export type inscriptionCreateWithoutPaiementInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   candidat: Prisma.candidatCreateNestedOneWithoutInscriptionInput
   concours: Prisma.concoursCreateNestedOneWithoutInscriptionInput
 }
 
 export type inscriptionUncheckedCreateWithoutPaiementInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_candidat: string
   id_concours: string
 }
@@ -564,77 +564,77 @@ export type inscriptionUpdateToOneWithWhereWithoutPaiementInput = {
 
 export type inscriptionUpdateWithoutPaiementInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   candidat?: Prisma.candidatUpdateOneRequiredWithoutInscriptionNestedInput
   concours?: Prisma.concoursUpdateOneRequiredWithoutInscriptionNestedInput
 }
 
 export type inscriptionUncheckedUpdateWithoutPaiementInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type inscriptionCreateManyCandidatInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_concours: string
 }
 
 export type inscriptionUpdateWithoutCandidatInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   concours?: Prisma.concoursUpdateOneRequiredWithoutInscriptionNestedInput
   paiement?: Prisma.paiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type inscriptionUncheckedUpdateWithoutCandidatInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
   paiement?: Prisma.paiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type inscriptionUncheckedUpdateManyWithoutCandidatInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_concours?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type inscriptionCreateManyConcoursInput = {
-  id_inscription: string
-  date_inscription?: Date | string | null
-  statut_inscription?: string | null
+  id_inscription?: string
+  date_inscription?: Date | string
+  statut_inscription?: string
   id_candidat: string
 }
 
 export type inscriptionUpdateWithoutConcoursInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   candidat?: Prisma.candidatUpdateOneRequiredWithoutInscriptionNestedInput
   paiement?: Prisma.paiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type inscriptionUncheckedUpdateWithoutConcoursInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
   paiement?: Prisma.paiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type inscriptionUncheckedUpdateManyWithoutConcoursInput = {
   id_inscription?: Prisma.StringFieldUpdateOperationsInput | string
-  date_inscription?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  statut_inscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date_inscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statut_inscription?: Prisma.StringFieldUpdateOperationsInput | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -734,8 +734,8 @@ export type $inscriptionPayload<ExtArgs extends runtime.Types.Extensions.Interna
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_inscription: string
-    date_inscription: Date | null
-    statut_inscription: string | null
+    date_inscription: Date
+    statut_inscription: string
     id_candidat: string
     id_concours: string
   }, ExtArgs["result"]["inscription"]>

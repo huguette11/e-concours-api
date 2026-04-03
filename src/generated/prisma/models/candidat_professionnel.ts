@@ -170,7 +170,7 @@ export type candidat_professionnelWhereInput = {
   AND?: Prisma.candidat_professionnelWhereInput | Prisma.candidat_professionnelWhereInput[]
   OR?: Prisma.candidat_professionnelWhereInput[]
   NOT?: Prisma.candidat_professionnelWhereInput | Prisma.candidat_professionnelWhereInput[]
-  id_candidat?: Prisma.StringFilter<"candidat_professionnel"> | string
+  id_candidat?: Prisma.UuidFilter<"candidat_professionnel"> | string
   matricule?: Prisma.StringFilter<"candidat_professionnel"> | string
   emploi?: Prisma.StringNullableFilter<"candidat_professionnel"> | string | null
   ministere?: Prisma.StringNullableFilter<"candidat_professionnel"> | string | null
@@ -187,14 +187,14 @@ export type candidat_professionnelOrderByWithRelationInput = {
 
 export type candidat_professionnelWhereUniqueInput = Prisma.AtLeast<{
   id_candidat?: string
+  matricule?: string
   AND?: Prisma.candidat_professionnelWhereInput | Prisma.candidat_professionnelWhereInput[]
   OR?: Prisma.candidat_professionnelWhereInput[]
   NOT?: Prisma.candidat_professionnelWhereInput | Prisma.candidat_professionnelWhereInput[]
-  matricule?: Prisma.StringFilter<"candidat_professionnel"> | string
   emploi?: Prisma.StringNullableFilter<"candidat_professionnel"> | string | null
   ministere?: Prisma.StringNullableFilter<"candidat_professionnel"> | string | null
   candidat?: Prisma.XOR<Prisma.CandidatScalarRelationFilter, Prisma.candidatWhereInput>
-}, "id_candidat">
+}, "id_candidat" | "matricule">
 
 export type candidat_professionnelOrderByWithAggregationInput = {
   id_candidat?: Prisma.SortOrder
@@ -210,7 +210,7 @@ export type candidat_professionnelScalarWhereWithAggregatesInput = {
   AND?: Prisma.candidat_professionnelScalarWhereWithAggregatesInput | Prisma.candidat_professionnelScalarWhereWithAggregatesInput[]
   OR?: Prisma.candidat_professionnelScalarWhereWithAggregatesInput[]
   NOT?: Prisma.candidat_professionnelScalarWhereWithAggregatesInput | Prisma.candidat_professionnelScalarWhereWithAggregatesInput[]
-  id_candidat?: Prisma.StringWithAggregatesFilter<"candidat_professionnel"> | string
+  id_candidat?: Prisma.UuidWithAggregatesFilter<"candidat_professionnel"> | string
   matricule?: Prisma.StringWithAggregatesFilter<"candidat_professionnel"> | string
   emploi?: Prisma.StringNullableWithAggregatesFilter<"candidat_professionnel"> | string | null
   ministere?: Prisma.StringNullableWithAggregatesFilter<"candidat_professionnel"> | string | null

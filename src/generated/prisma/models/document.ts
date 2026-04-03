@@ -151,7 +151,7 @@ export type DocumentGroupByOutputType = {
   id_document: string
   type_document: string
   fichier: string
-  date_upload: Date | null
+  date_upload: Date
   id_candidat: string
   _count: DocumentCountAggregateOutputType | null
   _min: DocumentMinAggregateOutputType | null
@@ -177,11 +177,11 @@ export type documentWhereInput = {
   AND?: Prisma.documentWhereInput | Prisma.documentWhereInput[]
   OR?: Prisma.documentWhereInput[]
   NOT?: Prisma.documentWhereInput | Prisma.documentWhereInput[]
-  id_document?: Prisma.StringFilter<"document"> | string
+  id_document?: Prisma.UuidFilter<"document"> | string
   type_document?: Prisma.StringFilter<"document"> | string
   fichier?: Prisma.StringFilter<"document"> | string
-  date_upload?: Prisma.DateTimeNullableFilter<"document"> | Date | string | null
-  id_candidat?: Prisma.StringFilter<"document"> | string
+  date_upload?: Prisma.DateTimeFilter<"document"> | Date | string
+  id_candidat?: Prisma.UuidFilter<"document"> | string
   candidat?: Prisma.XOR<Prisma.CandidatScalarRelationFilter, Prisma.candidatWhereInput>
 }
 
@@ -189,7 +189,7 @@ export type documentOrderByWithRelationInput = {
   id_document?: Prisma.SortOrder
   type_document?: Prisma.SortOrder
   fichier?: Prisma.SortOrder
-  date_upload?: Prisma.SortOrderInput | Prisma.SortOrder
+  date_upload?: Prisma.SortOrder
   id_candidat?: Prisma.SortOrder
   candidat?: Prisma.candidatOrderByWithRelationInput
 }
@@ -201,8 +201,8 @@ export type documentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.documentWhereInput | Prisma.documentWhereInput[]
   type_document?: Prisma.StringFilter<"document"> | string
   fichier?: Prisma.StringFilter<"document"> | string
-  date_upload?: Prisma.DateTimeNullableFilter<"document"> | Date | string | null
-  id_candidat?: Prisma.StringFilter<"document"> | string
+  date_upload?: Prisma.DateTimeFilter<"document"> | Date | string
+  id_candidat?: Prisma.UuidFilter<"document"> | string
   candidat?: Prisma.XOR<Prisma.CandidatScalarRelationFilter, Prisma.candidatWhereInput>
 }, "id_document">
 
@@ -210,7 +210,7 @@ export type documentOrderByWithAggregationInput = {
   id_document?: Prisma.SortOrder
   type_document?: Prisma.SortOrder
   fichier?: Prisma.SortOrder
-  date_upload?: Prisma.SortOrderInput | Prisma.SortOrder
+  date_upload?: Prisma.SortOrder
   id_candidat?: Prisma.SortOrder
   _count?: Prisma.documentCountOrderByAggregateInput
   _max?: Prisma.documentMaxOrderByAggregateInput
@@ -221,26 +221,26 @@ export type documentScalarWhereWithAggregatesInput = {
   AND?: Prisma.documentScalarWhereWithAggregatesInput | Prisma.documentScalarWhereWithAggregatesInput[]
   OR?: Prisma.documentScalarWhereWithAggregatesInput[]
   NOT?: Prisma.documentScalarWhereWithAggregatesInput | Prisma.documentScalarWhereWithAggregatesInput[]
-  id_document?: Prisma.StringWithAggregatesFilter<"document"> | string
+  id_document?: Prisma.UuidWithAggregatesFilter<"document"> | string
   type_document?: Prisma.StringWithAggregatesFilter<"document"> | string
   fichier?: Prisma.StringWithAggregatesFilter<"document"> | string
-  date_upload?: Prisma.DateTimeNullableWithAggregatesFilter<"document"> | Date | string | null
-  id_candidat?: Prisma.StringWithAggregatesFilter<"document"> | string
+  date_upload?: Prisma.DateTimeWithAggregatesFilter<"document"> | Date | string
+  id_candidat?: Prisma.UuidWithAggregatesFilter<"document"> | string
 }
 
 export type documentCreateInput = {
-  id_document: string
+  id_document?: string
   type_document: string
   fichier: string
-  date_upload?: Date | string | null
+  date_upload?: Date | string
   candidat: Prisma.candidatCreateNestedOneWithoutDocumentInput
 }
 
 export type documentUncheckedCreateInput = {
-  id_document: string
+  id_document?: string
   type_document: string
   fichier: string
-  date_upload?: Date | string | null
+  date_upload?: Date | string
   id_candidat: string
 }
 
@@ -248,7 +248,7 @@ export type documentUpdateInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidat?: Prisma.candidatUpdateOneRequiredWithoutDocumentNestedInput
 }
 
@@ -256,15 +256,15 @@ export type documentUncheckedUpdateInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type documentCreateManyInput = {
-  id_document: string
+  id_document?: string
   type_document: string
   fichier: string
-  date_upload?: Date | string | null
+  date_upload?: Date | string
   id_candidat: string
 }
 
@@ -272,14 +272,14 @@ export type documentUpdateManyMutationInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type documentUncheckedUpdateManyInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   id_candidat?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -360,17 +360,17 @@ export type documentUncheckedUpdateManyWithoutCandidatNestedInput = {
 }
 
 export type documentCreateWithoutCandidatInput = {
-  id_document: string
+  id_document?: string
   type_document: string
   fichier: string
-  date_upload?: Date | string | null
+  date_upload?: Date | string
 }
 
 export type documentUncheckedCreateWithoutCandidatInput = {
-  id_document: string
+  id_document?: string
   type_document: string
   fichier: string
-  date_upload?: Date | string | null
+  date_upload?: Date | string
 }
 
 export type documentCreateOrConnectWithoutCandidatInput = {
@@ -403,39 +403,39 @@ export type documentScalarWhereInput = {
   AND?: Prisma.documentScalarWhereInput | Prisma.documentScalarWhereInput[]
   OR?: Prisma.documentScalarWhereInput[]
   NOT?: Prisma.documentScalarWhereInput | Prisma.documentScalarWhereInput[]
-  id_document?: Prisma.StringFilter<"document"> | string
+  id_document?: Prisma.UuidFilter<"document"> | string
   type_document?: Prisma.StringFilter<"document"> | string
   fichier?: Prisma.StringFilter<"document"> | string
-  date_upload?: Prisma.DateTimeNullableFilter<"document"> | Date | string | null
-  id_candidat?: Prisma.StringFilter<"document"> | string
+  date_upload?: Prisma.DateTimeFilter<"document"> | Date | string
+  id_candidat?: Prisma.UuidFilter<"document"> | string
 }
 
 export type documentCreateManyCandidatInput = {
-  id_document: string
+  id_document?: string
   type_document: string
   fichier: string
-  date_upload?: Date | string | null
+  date_upload?: Date | string
 }
 
 export type documentUpdateWithoutCandidatInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type documentUncheckedUpdateWithoutCandidatInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type documentUncheckedUpdateManyWithoutCandidatInput = {
   id_document?: Prisma.StringFieldUpdateOperationsInput | string
   type_document?: Prisma.StringFieldUpdateOperationsInput | string
   fichier?: Prisma.StringFieldUpdateOperationsInput | string
-  date_upload?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  date_upload?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -495,7 +495,7 @@ export type $documentPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id_document: string
     type_document: string
     fichier: string
-    date_upload: Date | null
+    date_upload: Date
     id_candidat: string
   }, ExtArgs["result"]["document"]>
   composites: {}

@@ -48,7 +48,7 @@ export { Prisma }
 export type admin = Prisma.adminModel
 /**
  * Model candidat
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * 
  */
 export type candidat = Prisma.candidatModel
 /**
@@ -58,7 +58,7 @@ export type candidat = Prisma.candidatModel
 export type candidat_professionnel = Prisma.candidat_professionnelModel
 /**
  * Model concours
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * 
  */
 export type concours = Prisma.concoursModel
 /**
@@ -78,11 +78,11 @@ export type examen = Prisma.examenModel
 export type inscription = Prisma.inscriptionModel
 /**
  * Model paiement
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * 
  */
 export type paiement = Prisma.paiementModel
 /**
- * Model passer
- * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * Model resultat
+ * 
  */
-export type passer = Prisma.passerModel
+export type resultat = Prisma.resultatModel
