@@ -1,31 +1,63 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+enum RoleAdmin {
+  SUPERADMIN
+  GESTIONNAIRE
+}
+
+enum Sexe {
+  HOMME
+  FEMME
+}
+
+enum StatutCompte {
+  ACTIF
+  INACTIF
+  SUSPENDU
+}
+
+enum TypeConcours {
+  DIRECT
+  PROFESSIONNEL
+  HANDICAPE
+}
+
+// ─────────────────────────────────────────────
+// ADMIN
+// ─────────────────────────────────────────────
+
 model admin {
-  id_admin      String     @id @db.VarChar(50)
+  id_admin      String     @id @default(uuid()) @db.Uuid
   nom           String     @db.VarChar(100)
   prenom        String     @db.VarChar(100)
   email         String     @unique @db.VarChar(150)
-  mot_de_passe  String     @db.VarChar(100)
+  mot_de_passe  String     @db.VarChar(255)
   telephone     String?    @db.VarChar(20)
-  role          String?    @default("gestionnaire") @db.VarChar(50)
-  date_creation DateTime?  @default(now()) @db.Timestamp(6)
+  role          RoleAdmin  @default(GESTIONNAIRE)    
+  actif         Boolean    @default(true)
+  date_creation DateTime   @default(now()) @db.Timestamp(6)
+  updated_at    DateTime   @updatedAt
+
   concours      concours[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+// ─────────────────────────────────────────────
+// CANDIDAT
+// ─────────────────────────────────────────────
+
 model candidat {
-  id_candidat            String                  @id @db.VarChar(50)
+  id_candidat            String                  @id @default(uuid()) @db.Uuid
   nom                    String                  @db.VarChar(100)
   prenom                 String                  @db.VarChar(100)
   nom_jeune_fille        String?                 @db.VarChar(100)
-  sexe                   String?                 @db.VarChar(10)
+  sexe                   Sexe                              
   date_naissance         DateTime                @db.Date
   lieu_naissance         String?                 @db.VarChar(150)
   pays_naissance         String?                 @db.VarChar(150)
@@ -33,66 +65,91 @@ model candidat {
   date_delivrance        DateTime?               @db.Date
   telephone              String?                 @db.VarChar(20)
   email                  String                  @unique @db.VarChar(150)
-  mot_de_passe           String                  @db.VarChar(100)
-  recepisse              String?                 @db.VarChar(100)
-  statut_compte          String?                 @default("actif") @db.VarChar(50)
-  date_creation          DateTime?               @default(now()) @db.Timestamp(6)
+  mot_de_passe           String                  @db.VarChar(255)
+  recepisse              String?                 @db.VarChar(500)
+  statut_compte          StatutCompte            @default(ACTIF)  
+  date_creation          DateTime                @default(now()) @db.Timestamp(6)
+
   candidat_professionnel candidat_professionnel?
   document               document[]
   inscription            inscription[]
-  passer                 passer[]
+  resultat               resultat[]                        
 }
 
+// ─────────────────────────────────────────────
+// CANDIDAT PROFESSIONNEL
+// ─────────────────────────────────────────────
+
 model candidat_professionnel {
-  id_candidat String   @id @db.VarChar(50)
-  matricule   String   @db.VarChar(100)
+  id_candidat String   @id @db.Uuid
+  matricule   String   @unique @db.VarChar(100)
   emploi      String?  @db.VarChar(150)
   ministere   String?  @db.VarChar(150)
+
   candidat    candidat @relation(fields: [id_candidat], references: [id_candidat], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+// ─────────────────────────────────────────────
+// CONCOURS
+// ─────────────────────────────────────────────
+
 model concours {
-  id_concours       String        @id @db.VarChar(50)
-  nom               String        @db.VarChar(200)
-  type              String?       @db.VarChar(50)
-  description       String?
-  frais_inscription Decimal       @db.Decimal(10, 2)
-  date_debut        DateTime      @db.Date
-  date_fin          DateTime      @db.Date
-  statut_concours   String?       @default("ouvert") @db.VarChar(50)
-  id_admin          String?       @db.VarChar(50)
-  admin             admin?        @relation(fields: [id_admin], references: [id_admin], onDelete: NoAction, onUpdate: NoAction)
+  id_concours       String         @id @default(uuid()) @db.Uuid
+  nom               String         @db.VarChar(200)
+  type              TypeConcours                        
+  description       String?        @db.Text
+  frais_inscription Decimal        @db.Decimal(10, 2)
+  nombre_postes     Int
+  annee             Int
+  date_debut        DateTime       @db.Date
+  date_fin          DateTime       @db.Date
+  statut_concours   String         @default("ouvert") @db.VarChar(50)
+  id_admin          String?        @db.Uuid            
+
+  admin             admin?         @relation(fields: [id_admin], references: [id_admin], onDelete: NoAction, onUpdate: NoAction)
   examen            examen[]
   inscription       inscription[]
 }
 
+// ─────────────────────────────────────────────
+// DOCUMENT
+// ─────────────────────────────────────────────
+
 model document {
-  id_document   String    @id @db.VarChar(50)
+  id_document   String    @id @default(uuid()) @db.Uuid
   type_document String    @db.VarChar(100)
-  fichier       String    @db.VarChar(50)
-  date_upload   DateTime? @default(now()) @db.Timestamp(6)
-  id_candidat   String    @db.VarChar(50)
+  fichier       String    @db.VarChar(500)            
+  date_upload   DateTime  @default(now()) @db.Timestamp(6)
+  id_candidat   String    @db.Uuid                    
+
   candidat      candidat  @relation(fields: [id_candidat], references: [id_candidat], onDelete: Cascade, onUpdate: NoAction)
 }
 
+// ─────────────────────────────────────────────
+// EXAMEN
+// ─────────────────────────────────────────────
+
 model examen {
-  id_examen   String    @id @db.VarChar(50)
+  id_examen   String    @id @default(uuid()) @db.Uuid
   date_examen DateTime  @db.Date
   heure       DateTime? @db.Time(6)
   lieu        String?   @db.VarChar(200)
   type_examen String?   @db.VarChar(50)
-  id_concours String    @db.VarChar(50)
+  id_concours String    @db.Uuid                      
+
   concours    concours  @relation(fields: [id_concours], references: [id_concours], onDelete: Cascade, onUpdate: NoAction)
-  passer      passer[]
+  resultat    resultat[]                            
 }
+// ─────────────────────────────────────────────
+// INSCRIPTION
+// ─────────────────────────────────────────────
 
 model inscription {
-  id_inscription     String     @id @db.VarChar(50)
-  date_inscription   DateTime?  @default(now()) @db.Timestamp(6)
-  statut_inscription String?    @default("en_attente") @db.VarChar(50)
-  id_candidat        String     @db.VarChar(50)
-  id_concours        String     @db.VarChar(50)
+  id_inscription     String     @id @default(uuid()) @db.Uuid
+  date_inscription   DateTime   @default(now()) @db.Timestamp(6)
+  statut_inscription String     @default("en_attente") @db.VarChar(50)
+  id_candidat        String     @db.Uuid              
+  id_concours        String     @db.Uuid              
   candidat           candidat   @relation(fields: [id_candidat], references: [id_candidat], onDelete: Cascade, onUpdate: NoAction)
   concours           concours   @relation(fields: [id_concours], references: [id_concours], onDelete: Cascade, onUpdate: NoAction)
   paiement           paiement[]
@@ -100,27 +157,34 @@ model inscription {
   @@unique([id_candidat, id_concours])
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+// ─────────────────────────────────────────────
+// PAIEMENT
+// ─────────────────────────────────────────────
+
 model paiement {
-  id_paiement           String      @id @db.VarChar(50)
+  id_paiement           String      @id @default(uuid()) @db.Uuid
   montant               Decimal     @db.Decimal(10, 2)
-  date_paiement         DateTime?   @default(now()) @db.Timestamp(6)
+  date_paiement         DateTime    @default(now()) @db.Timestamp(6)
   mode_paiement         String?     @db.VarChar(50)
   reference_transaction String?     @unique @db.VarChar(150)
-  statut_paiement       String?     @default("en_attente") @db.VarChar(50)
-  id_inscription        String      @db.VarChar(50)
+  statut_paiement       String      @default("en_attente") @db.VarChar(50)
+  id_inscription        String      @db.Uuid              
   inscription           inscription @relation(fields: [id_inscription], references: [id_inscription], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model passer {
-  id_candidat      String   @db.VarChar(50)
-  id_examen        String   @db.VarChar(50)
+// ─────────────────────────────────────────────
+// RESULTAT  (anciennement "passer")
+// ─────────────────────────────────────────────
+
+model resultat {
+  id_candidat      String   @db.Uuid    
+  id_examen        String   @db.Uuid    
   note             Decimal? @db.Decimal(5, 2)
   moyenne_generale Decimal? @db.Decimal(5, 2)
   statut           String?  @db.VarChar(50)
+
   candidat         candidat @relation(fields: [id_candidat], references: [id_candidat], onDelete: Cascade, onUpdate: NoAction)
   examen           examen   @relation(fields: [id_examen], references: [id_examen], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([id_candidat, id_examen])
-}
+  }
