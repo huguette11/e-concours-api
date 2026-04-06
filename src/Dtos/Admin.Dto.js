@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-export class AdminDtos {
+export class AdminDto {
   static ValidateLogin() {
     return [
       body("username").notEmpty("Le nom est requis").isString(),

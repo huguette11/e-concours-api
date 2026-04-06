@@ -1,6 +1,7 @@
 import { prisma } from "../prisma.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { promises } from "nodemailer/lib/xoauth2/index.js";
 
 export class AdminController {
   static async Register(req, res) {
@@ -15,7 +16,7 @@ export class AdminController {
       }
       const passwordHash = await bcrypt.hash(mot_de_passe, 10);
       const RegisterAdmin = await prisma.$transaction(async ($tx) => {
-        const admin = await $tx.admin.create({
+        const admin = await tx.admin.create({
           data: {
             email,
             mot_de_passe: passwordHash,
@@ -281,69 +282,85 @@ export class AdminController {
   }
 
   /// methode pour creer un concours ...
+static async CreateConcours(req, res) {
+  try {
+    const {
+      nom,
+      type,
+      description,
+      nombre_postes,
+      annee,
+      date_debut,
+      date_fin,
+      statut_concours,
+      centres
+    } = req.body;
 
-  static async CreateConcours(req, res) {
-    try {
-      const {
-        nom,
-        type,
-        description,
-        nombre_postes,
-        annee,
-        date_debut,
-        date_fin,
-        statut_concours,
-      } = req.body;
+    const id_admin = req.admin.id_admin;
 
-      const id_admin = req.admin.id_admin;
-
-      if (!id_admin || req.admin.actif === false) {
-        return res.status(401).json({
-          error: "vous n'etes pas autoriser a effectuer cette action",
-        });
-      }
-
-      // voir si un concours du meme nom n'est pas dans la base de donnnes
-
-      const exists = await prisma.concours.findFirst({
-        where: {
-          nom: {
-            equals: nom,
-            mode: "insensitive",
-          },
-        },
+    if (!id_admin || req.admin.actif === false) {
+      return res.status(401).json({
+        error: "vous n'etes pas autoriser a effectuer cette action",
       });
+    }
 
-      if (exists) {
-        return res.status(409).json({ error: "ce concours existe deja" });
-      }
+    // verifiaction ..
+    const exists = await prisma.concours.findFirst({
+      where: {
+        nom: {
+          equals: nom,
+          mode: "insensitive",
+        },
+      },
+    });
 
-      // on va creer le concours en utilisation une transaction au cas ou une erreur surviens
-      const ConcoursCreate = await prisma.$transaction(async ($tx) => {
-        const concours = await prisma.$tx.concours.create({
+    if (exists) {
+      return res.status(409).json({ error: "ce concours existe deja" });
+    }
+
+  
+    const concoursCreate = await prisma.$transaction(async (tx) => {
+      const concours = await tx.concours.create({
+        data: {
           nom,
           type,
           description,
           frais_inscription: 800,
           nombre_postes,
           annee,
-          date_debut,
-          date_fin,
+          date_debut: new Date(date_debut),
+          date_fin: new Date(date_fin),
           statut_concours,
           id_admin,
-        });
-        return concours;
+
+          centres: {
+            connect: centres.map(id => ({ id })) 
+          }
+        },
+        include: {
+          centres: {
+            select: {
+              nom_centre: true
+            }
+          }
+        }
       });
 
-      return res.status(201).json({
-        message: `{ concours ${ConcoursCreate.nom} creer avec succes}`,
-      });
-    } catch (err) {
-      return res.status(500).json({
-        error: "une erreur est survenue lors de la creation du concours",
-      });
-    }
+      return concours;
+    });
+
+    return res.status(201).json({
+      message: `concours ${concoursCreate.nom} créé avec succès`,
+      data: concoursCreate
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "une erreur est survenue lors de la creation du concours",
+    });
   }
+}
 
   static async UpdateConcours(req, res) {
     try {
@@ -383,16 +400,13 @@ export class AdminController {
           id_admin,
         },
       });
-      return res
-        .status(200)
-        .json({
-          message: "les informations du concours ont ete mises a jours",
-        });
+      return res.status(200).json({
+        message: "les informations du concours ont ete mises a jours",
+      });
     } catch (err) {
-        console.log(err);
+      console.log(err);
       return res.status(500).json({ message: "une erreur est survenue " });
       /// voir l'erreur en dev
-    
     }
   }
 
@@ -411,16 +425,92 @@ export class AdminController {
         .status(200)
         .json({ message: "concours supprime avec success!" });
     } catch (err) {
-        console.log(err);
+      console.log(err);
       return res.status(500).json({ error: "une erreur est survenue" });
     }
   }
 
-  async GetAllConcours (res){
-    try{
+  async GetAllConcours(req,res) {
+    try {
+      const page = parseInt (req.query.page) || 1; 
+      const limit = 10;
+      const skip =( page-1) * limit;
+
+      const [concours,total] =  await promises.all([
+      await prisma.concours.findMany({
+        skip,
+        take:limit,
+        orderBy: { date_debut: "desc" },
+        select: {
+          id_concours: true,
+          nom: true,
+          type: true,
+          statut_concours: true,
+          date_debut: true,
+          date_fin: true,
+          nombre_postes: true,
+          _count: { select: { inscription: true } },
+        },
+      }),
+      prisma.concours.count(),
+      ]);
+      res.status(200).json({ 
+        page,
+        data :concours,
+        limit,
+        total,
+        totalPages:Math.ceil(total/limit)
+       });
+    } catch (err) {
+      console.log("une erreur est survenue", err);
+    }
+  }
+
+  async SwitchStatuConcours(req, res) {
+    try {
+      const { statut_concours } = req.body;
+      const { id_concours } = req.params;
+      if (!id_concours) {
+        return res.status(400).json({ error: "id manquant" });
+      }
+
+      const concours = await prisma.concours.findUnique({
+        where: { id_concours },
+      });
+      if (!concours) {
+        return res.status(404).json({ error: "concours non trouve" });
+      }
+
+      await prisma.concours.update({
+        where: { id_concours },
+        data: {
+          statut_concours,
+        },
+      });
+      return res.status(200).json({ message: "status changer avec succes" });
+    } catch (err) {
+      console.log("une erreur est survenue :", err);
+      return res.status(500).json({ error: "une erreur est surveue" });
+    }
+  }
+
+  async SearchConcours(req, res) {
+    try {
+      const { type, nom, annee, date_debut, date_fin } = req.query;
 
       const concours = await prisma.concours.findMany({
-            orderBy: { date_debut: "desc" },
+        where: {
+          ...(nom && {
+            nom: {
+              contains: nom,
+              mode: "insensitive",
+            },
+            ...(type && { type }),
+            ...(annee && { annee }),
+            ...(date_debut && { date_debut: { gte: new Date(date_debut) } }),
+            ...(date_fin && { date_fin: { lte: new Date(date_fin) } }),
+          }),
+          orderBy: { date_debut: "desc" },
           select: {
             id_concours: true,
             nom: true,
@@ -431,12 +521,91 @@ export class AdminController {
             nombre_postes: true,
             _count: { select: { inscription: true } },
           },
+        },
       });
-      res.status(200).json({concours:concours})
-    }
-    catch(err){
 
+      if (concours.length === 0) {
+        return res.status(404).json({ err: "aucun concous trouve" });
+      }
+
+      return res.status(200).json({ concours });
+    } catch (err) {
+      console.log("une erreur est survenue");
+
+      return res.status(500).json({ error: "une erreur est survenue" });
     }
   }
+  // CRUD et gestions candidat
+
+  async SearchCandidat(req, res) {
+    try {
+      const { nom, prenom, sexe, pays_naissance, email, status, matricule } =
+        req.query;
+      const candidat = await prisma.candidat.findMany({
+        where: {
+          ...(nom && {
+            nom: {
+              contains: nom,
+              mode: "insensitive",
+            },
+          }),
+          ...(prenom && {
+            prenom: {
+              contains: prenom,
+              mode: "insensitive",
+            },
+          }),
+
+          ...(sexe && {sexe}),
+          ...(pays_naissance && {pays_naissance}),
+          ...(email && {
+            email: {
+              contains: email,
+              mode: "insensitive",
+            },
+          }),
+          ...(status && {status}),
+          ...(matricule & {matricule}),
+
+          delete_at:null
+        },
+      
+        orderBy: { date_creation: "desc" },
+        select: {
+          nom: true,
+          prenom: true,
+          sexe: true,
+          date_naissance: true,
+          telephone: true,
+          email: true,
+        },
+      });
+
+      if (candidat.length === 0) {
+        return res.status(404).json({ error: "aucun candidat trouver" });
+      }
+
+      return res.status(200).json({ candidat });
+    } catch (err) {
+        console.log("une erreur est survenue", err);
+      return res.status(500).json({ error: "une erreur est survenue" });
+    
+    }
+  }
+
+  async ListesPaiments(req,res){
+    try{
+      const[paiement,nombrePaiement] = await promises.all([
+        await prisma.paiement.findMany({}),
+        await prisma.paiement.count()
+      ]);
+      
+    }
+    catch(err){
+      
+    }
+  }
+
+
   static async Logout() {}
 }
