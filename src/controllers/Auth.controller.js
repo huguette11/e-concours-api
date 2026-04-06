@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { contactTemplate } from "../services/templates/Mail/contactUs.js"
 import { sendMailContact } from "../config/mailer.js";
 export class AuthController {
+  
   constructor(notificationService) {
     this.notificationService = notificationService;
 
@@ -111,8 +112,8 @@ export class AuthController {
             email,
             mot_de_passe: motDePasseHashe,
             statut_compte: "INACTIF",
-            // otp,
-            // otp_expire_at,
+            otp,
+            otp_expire_at,
           },
         });
 
@@ -144,13 +145,16 @@ export class AuthController {
           break;
       }
 
+
+
+      const refreshToken = jwt.sign({
+id:candidat.id, email:candidat.email
+      }, process.env.JWT_SECRET,{expiresIn:"24h"})
       res.status(201).json({
         message: "Compte créé, code OTP envoyé",
         candidat: {
-          id_candidat: candidat.id_candidat,
           nom: candidat.nom,
-          prenom: candidat.prenom,
-          email: candidat.email,
+          token: refreshToken
         },
       });
     } catch (err) {
@@ -164,7 +168,9 @@ export class AuthController {
 
   async VerifierOtp(req, res) {
     try {
-      const { email, otp } = req.body; // pas req.body()
+      const { otp } = req.body; 
+
+        const email = req.user.email;
 
       const candidat = await prisma.candidat.findUnique({ where: { email } });
 
