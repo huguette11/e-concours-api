@@ -45,6 +45,11 @@ enum TypeCandidat {
   DIRECT        
   PROFESSIONNEL 
 }
+enum statut_concours {
+  ouvert
+  fermé
+  en_attente
+}
 
 // ─────────────────────────────────────────────
 // ADMIN
@@ -117,7 +122,7 @@ model concours {
   annee             Int
   date_debut        DateTime     @db.Date
   date_fin          DateTime     @db.Date
-  statut_concours   String       @default("ouvert") @db.VarChar(50)
+  statut_concours   String       @default("fermé") @db.VarChar(50)
   id_admin          String?      @db.Uuid
 
   admin       admin?        @relation(fields: [id_admin], references: [id_admin], onDelete: NoAction, onUpdate: NoAction)

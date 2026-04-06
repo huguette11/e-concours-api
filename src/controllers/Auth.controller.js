@@ -49,7 +49,9 @@ export class AuthController {
         process.env.JWT_SECRET,
         { expiresIn: "24h" },
       );
-
+      console.log("Token généré:", token); 
+      console.log("process jwt:", process.env.JWT_SECRET); 
+      
       res.json({ message: "Connexion réussie", token });
     } catch (err) {
       console.error(err);
