@@ -14,7 +14,7 @@ transporter.verify((error, success) => {
   if (error) {
     console.error('Erreur SMTP:', error);
   } else {
-    console.log('Serveur SMTP prêt ✅');
+    console.log('Serveur SMTP prêt ');
   }
 });
 

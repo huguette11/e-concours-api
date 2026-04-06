@@ -60,7 +60,8 @@ export class CandidatDto {
         .withMessage("La date de délivrance est invalide"),
 
       body("telephone")
-        .optional()
+        .notEmpty()
+        .withMessage('le numero de telephone est requis')
         .isMobilePhone()
         .withMessage("Le numéro de téléphone est invalide"),
 
@@ -99,26 +100,24 @@ export class CandidatDto {
   }
 
   static ValidateContactUs() {
-return [
-    // Nom
-    body("nom")
-      .notEmpty()
-      .withMessage("Le nom est requis")
-      .isString()
-      .withMessage("Le nom doit être une chaîne de caractères")
-      .isLength({ min: 2 })
-      .withMessage("Le nom doit contenir au moins 2 caractères"),
+    return [
+      // Nom
+      body("nom")
+        .notEmpty()
+        .withMessage("Le nom est requis")
+        .isString()
+        .withMessage("Le nom doit être une chaîne de caractères")
+        .isLength({ min: 2 })
+        .withMessage("Le nom doit contenir au moins 2 caractères"),
 
-    body("email")
-      .notEmpty()
-      .withMessage("Le champ email est requis")
-      .isEmail()
-      .withMessage("Le champ doit être un email valide"),
+      body("email")
+        .notEmpty()
+        .withMessage("Le champ email est requis")
+        .isEmail()
+        .withMessage("Le champ doit être un email valide"),
 
-    body("message")
-      .notEmpty()
-      .withMessage("Le champ message est requis"),
-  ];
+      body("message").notEmpty().withMessage("Le champ message est requis"),
+    ];
   }
 
   // static ValidateVerify(){

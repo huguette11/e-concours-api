@@ -11,7 +11,7 @@ const router = express.Router();
 router.post('/login', CandidatDto.ValidateLogin(), ValidateRequest.handle, authController.Login);
 router.post('/register', CandidatDto.validateRegister(), ValidateRequest.handle, authController.Register);
 router.post('/verify', ValidateRequest.handle, authController.VerifierOtp);
-router.post('/contact-us',CandidatDto.ValidateContactUs(),ValidateRequest.handle,authController.ContactUS);
+router.post('/contact-us',CandidatDto.ValidateContactUs(),ValidateRequest.handle,authController.ContactUS)
 
 
 
