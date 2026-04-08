@@ -1,48 +1,45 @@
 import { body } from "express-validator";
 
 export class ConcoursDto {
-  static ValidateCreateConcours() {
-    return [
-      body("type")
-        .isString()
-        .withMessage("Le type de concours doit etre en chaine de caractere")
-        .isIn(["DIRECT", "PROFESSIONNEL", "HANDICAPE"])
-        .notEmpty()
-        .withMessage("le type du concours ne dois pas etre vide"),
-      body("nom")
-        .isString("le nom du concours dois etre en chaine de caractere")
-        .notEmpty()
-        .withMessage("Nom du concours ne dois pas etre vide"),
+static ValidateCreateConcours() {
+  return [
+    body("type")
+      .notEmpty().withMessage("Le type du concours ne doit pas être vide")
+      .isString().withMessage("Le type doit être une chaîne de caractères")
+      .isIn(["DIRECT", "PROFESSIONNEL", "HANDICAPE"])
+      .withMessage("Type invalide"),
 
-      body("description")
-        .notEmpty()
-        .withMessage("Descriptions ne dois pas etre vide"),
-      body("nombre_postes")
-        .isInt()
-        .withMessage("le nombre de postes a promouvoir dois etre en entier")
-        .notEmpty()
-        .withMessage("le nombre de postes ne dois pas etre vide"),
+    body("nom")
+      .notEmpty().withMessage("Nom du concours ne doit pas être vide")
+      .isString().withMessage("Le nom doit être une chaîne de caractères"),
 
-      body("annee")
-        .isInt()
-        .withMessage("annee dois etre en entier")
-        .notEmpty()
-        .withMessage("annee  ne dois pas etre vide"),
+    body("description")
+      .notEmpty().withMessage("Description ne doit pas être vide"),
 
-      body("date_debut")
-        .optional()
-        .isDate()
-        .withMessage("date debut doit etre une date"),
+    body("nombre_postes")
+      .notEmpty().withMessage("Le nombre de postes ne doit pas être vide")
+      .isInt().withMessage("Le nombre de postes doit être un entier"),
 
-      body("date_fin")
-        .optional()
-        .isDate()
-        .withMessage("date fin doit etre une date"),
+    body("annee")
+      .notEmpty().withMessage("L'année ne doit pas être vide")
+      .isInt().withMessage("L'année doit être un entier"),
 
-        //Hugutte devrais typer le status_concours pour que je puisse utiliser sanns soucis
-      body("statut_concours").optional,
-    ];
-  }
+    body("date_debut")
+      .optional()
+      .isISO8601()
+      .withMessage("La date de début doit être une date valide"),
+
+    body("date_fin")
+      .optional()
+      .isISO8601()
+      .withMessage("La date de fin doit être une date valide"),
+
+    body("statut_concours")
+      .optional()
+      .isIn(["EN_ATTENTE", "OUVERT", "FERME"])
+      .withMessage("Statut invalide"),
+  ];
+}
 
   static  ValidateUpdateConcours(){
     return[

@@ -2,10 +2,9 @@ import { prisma } from "../prisma.js";
 import bcrypt from "bcrypt";
 import { response } from "express";
 import jwt from "jsonwebtoken";
-import { contactTemplate } from "../services/templates/Mail/contactUs.js"
+import { contactTemplate } from "../services/templates/Mail/contactUs.js";
 import { sendMailContact } from "../config/mailer.js";
 export class AuthController {
-  
   constructor(notificationService) {
     this.notificationService = notificationService;
 
@@ -14,6 +13,7 @@ export class AuthController {
     this.VerifierOtp = this.VerifierOtp.bind(this);
     this.ForgotPassword = this.ForgotPassword.bind(this);
     this.Logout = this.Logout.bind(this);
+    this.ResendOtp = this.ResendOtp.bind(this);
   }
 
   async Login(req, res) {
@@ -50,9 +50,9 @@ export class AuthController {
         process.env.JWT_SECRET,
         { expiresIn: "24h" },
       );
-      console.log("Token généré:", token); 
-      console.log("process jwt:", process.env.JWT_SECRET); 
-      
+      console.log("Token généré:", token);
+      console.log("process jwt:", process.env.JWT_SECRET);
+
       res.json({ message: "Connexion réussie", token });
     } catch (err) {
       console.error(err);
@@ -147,16 +147,19 @@ export class AuthController {
           break;
       }
 
-
-
-      const refreshToken = jwt.sign({
-id:candidat.id, email:candidat.email
-      }, process.env.JWT_SECRET,{expiresIn:"24h"})
+      const refreshToken = jwt.sign(
+        {
+          id: candidat.id,
+          email: candidat.email,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" },
+      );
       res.status(201).json({
         message: "Compte créé, code OTP envoyé",
         candidat: {
           nom: candidat.nom,
-          token: refreshToken
+          token: refreshToken,
         },
       });
     } catch (err) {
@@ -170,9 +173,9 @@ id:candidat.id, email:candidat.email
 
   async VerifierOtp(req, res) {
     try {
-      const { otp } = req.body; 
+      const { otp } = req.body;
 
-        const email = req.user.email;
+      const email = req.user.email;
 
       const candidat = await prisma.candidat.findUnique({ where: { email } });
 
@@ -202,11 +205,30 @@ id:candidat.id, email:candidat.email
     }
   }
 
+  async ResendOtp() {
+    try {
+      const candidat = req.user.id;
+      if (!candidat) {
+        return res.status(404).json({ error: "candidat non trouver" });
+      }
+      this.notificationService.email = candidat.email;
+      this.notificationService.telephone = candidat.telephone;
+      const otp = this.notificationService.genererOtp();
+      if (await this.notificationService.envoyerOtpTelephone(otp)) {
+        return res
+          .status(200)
+          .json({ message: "code de verification envoyer avec succes" });
+      }
+    } catch (err) {
+      return res.status(500).json({ error: "une erreur est survenue" });
+    }
+  }
+
   // mots de passe oublier .. methode pour recuperer le mots de passe (demander un code Otp)
 
   async ForgotPassword(req, res) {
     try {
-      const { email, telephone, choix } = req.body; 
+      const { email, telephone, choix } = req.body;
 
       let candidat;
 
@@ -290,46 +312,41 @@ id:candidat.id, email:candidat.email
           otp: null,
         },
       });
-      updatedC();
-    });
-
-    return res
-      .status(200)
-      .json({
-        message: `Bonjour ${UpdateCandidat.nom} {votre mots de passe a ete reinitialiser}`,
-      });
-  }
-
-
-async ContactUS(req, res) {
-  try {
-    const { email, message, nom } = req.body;
-
-
-    // le template est a refaire j'utilise un template de test
-    
-    const html = contactTemplate({nom,email,message})
-
-    await sendMailContact({
-      to: process.env.MAIL_USER, 
-      subject: "Nouveau message de contact",
-      html,
-      email, 
+      return updatedC;
     });
 
     return res.status(200).json({
-      message: "Message envoyé avec succès",
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      error: "Erreur serveur",
+      message: `Bonjour ${UpdateCandidat.nom} {votre mots de passe a ete reinitialiser}`,
     });
   }
-}
-   async Logout(req, res) {
+
+  async ContactUS(req, res) {
+    try {
+      const { email, message, nom } = req.body;
+
+      // le template est a refaire j'utilise un template de test
+
+      const html = contactTemplate({ nom, email, message });
+
+      await sendMailContact({
+        to: process.env.MAIL_USER,
+        subject: "Nouveau message de contact",
+        html,
+        email,
+      });
+
+      return res.status(200).json({
+        message: "Message envoyé avec succès",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        error: "Erreur serveur",
+      });
+    }
+  }
+  async Logout(req, res) {
     res.json({ message: "Déconnexion réussie" });
   }
 }

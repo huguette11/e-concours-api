@@ -3,8 +3,8 @@ import { body } from "express-validator";
 export class AdminDto {
   static ValidateLogin() {
     return [
-      body("username").notEmpty("Le nom est requis").isString(),
-      body("password").notEmpty().withMessage("mots de passe requis"),
+      body("email").notEmpty().withMessage('le email est requis').isString(),
+      body("mot_de_passe").notEmpty().withMessage("mots de passe requis"),
     ];
   }
 
@@ -17,6 +17,12 @@ export class AdminDto {
         body('telephone').notEmpty().withMessage('Le telephone est requis').isMobilePhone().isLength({min:8, max:8}).withMessage('le numero de telephone dois contenir 8 caractere'),
         body('role').optional().isIn([ 'SUPERADMIN','GESTIONNAIRE']).withMessage('le role que vous avez choisi n\'est pas pris en compte'),
         
+    ];
+  }
+
+  static ValidateCreateCentre(){
+    return[
+      body('nom').isString().withMessage('le centre dois etre une chaine').notEmpty().withMessage('le nom du centre est requis')
     ];
   }
 }
