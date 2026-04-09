@@ -2,6 +2,8 @@ import { prisma } from "../prisma.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { generateReceipt } from "../services/Upload-file.service.js";
+import { connection as redis } from "../config/redis.js";
+import { json } from "express";
 
 export class AdminController {
   static async Register(req, res) {
@@ -71,7 +73,7 @@ export class AdminController {
           role: admin.role,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "2h" },
+        { expiresIn: "24h" },
       );
 
       return res.status(200).json({
@@ -281,117 +283,121 @@ export class AdminController {
     }
   }
 
-static async CreateCentre(req, res) {
-  try {
-    const { nom } = req.body;
+  static async CreateCentre(req, res) {
+    try {
+      const { nom } = req.body;
 
-    // Verifier centre
-    const centresExistants = await prisma.centre.findMany({
-      where: {
-        nom: {
-          contains: nom,
-          mode: "insensitive"
-        }
+      // Verifier centre
+      const centresExistants = await prisma.centre.findMany({
+        where: {
+          nom: {
+            contains: nom,
+            mode: "insensitive",
+          },
+        },
+      });
+
+      if (centresExistants.length > 0) {
+        return res
+          .status(400)
+          .json({ error: "Un centre avec ce nom existe déjà" });
       }
-    });
 
-    if (centresExistants.length > 0) {
-      return res.status(400).json({ error: 'Un centre avec ce nom existe déjà' });
+      // Créer le centre
+      const nouveauCentre = await prisma.centre.create({
+        data: { nom },
+      });
+
+      return res.status(201).json(nouveauCentre);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Une erreur est survenue" });
     }
-
-    // Créer le centre
-    const nouveauCentre = await prisma.centre.create({
-      data: { nom }
-    });
-
-    return res.status(201).json(nouveauCentre);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Une erreur est survenue' });
   }
-}
 
   /// methode pour creer un concours ...
-static async CreateConcours(req, res) {
-  try {
-    const {
-      nom,
-      type,
-      description,
-      nombre_postes,
-      annee,
-      date_debut,
-      date_fin,
-      statut_concours,
-      centres, 
-    } = req.body;
+  static async CreateConcours(req, res) {
+    try {
+      const {
+        nom,
+        type,
+        description,
+        nombre_postes,
+        annee,
+        date_debut,
+        date_fin,
+        statut_concours,
+        categorieId,
+        centres,
+      } = req.body;
 
-    const id_admin = req.admin.id_admin;
+      const id_admin = req.admin.id_admin;
 
-    if (!id_admin || req.admin.actif === false) {
-      return res.status(401).json({
-        error: "Vous n'êtes pas autorisé à effectuer cette action",
-      });
-    }
+      if (!id_admin || req.admin.actif === false) {
+        return res.status(401).json({
+          error: "Vous n'êtes pas autorisé à effectuer cette action",
+        });
+      }
 
-    // verifions si le centre nomme existe deja ou pas
-    const exists = await prisma.concours.findFirst({
-      where: {
-        nom: {
-          equals: nom,
-          mode: "insensitive",
-        },
-      },
-    });
-
-    if (exists) {
-      return res.status(409).json({ error: "Ce concours existe déjà" });
-    }
-
-// creation du centre avec tous les liens
-    const concoursCreate = await prisma.$transaction(async (tx) => {
-      const concours = await tx.concours.create({
-        data: {
-          nom,
-          type,
-          description,
-          frais_inscription: 800,
-          nombre_postes,
-          annee,
-          date_debut: new Date(date_debut),
-          date_fin: new Date(date_fin),
-          statut_concours,
-          id_admin,
-
-          centres: {
-            create: centres.map((id_centre) => ({
-              centre: { connect: { id_centre } },
-            })),
+      // verifions si le centre nomme existe deja ou pas
+      const exists = await prisma.concours.findFirst({
+        where: {
+          nom: {
+            equals: nom,
+            mode: "insensitive",
           },
         },
-        include: {
-          centres: {
-            select: {
-              centre: { select: { nom: true, id_centre: true } },
+      });
+
+      if (exists) {
+        return res.status(409).json({ error: "Ce concours existe déjà" });
+      }
+
+      // creation du centre avec tous les liens
+      const concoursCreate = await prisma.$transaction(async (tx) => {
+        const concours = await tx.concours.create({
+          data: {
+            nom,
+            type,
+            description,
+            frais_inscription: 800,
+            nombre_postes,
+            annee,
+            date_debut: new Date(date_debut),
+            date_fin: new Date(date_fin),
+            statut_concours,
+            id_admin,
+            categorieId,
+            centres: {
+              create: centres.map((id_centre) => ({
+                centre: { connect: { id_centre } },
+              })),
             },
           },
-        },
+          include: {
+            centres: {
+              select: {
+                centre: { select: { nom: true, id_centre: true } },
+              },
+              categorie: { select: { libelle: true } },
+            },
+          },
+        });
+
+        return concours;
       });
 
-      return concours;
-    });
-
-    return res.status(201).json({
-      message: `Concours ${concoursCreate.nom} créé avec succès`,
-      data: concoursCreate,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      error: "Une erreur est survenue lors de la création du concours",
-    });
+      return res.status(201).json({
+        message: `Concours ${concoursCreate.nom} créé avec succès`,
+        data: concoursCreate,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        error: "Une erreur est survenue lors de la création du concours",
+      });
+    }
   }
-}
 
   static async UpdateConcours(req, res) {
     try {
@@ -489,17 +495,23 @@ static async CreateConcours(req, res) {
           _count: {
             select: { inscription: true },
           },
-          centres:{
-            select:{
-              centre:{
-                select:{
-                  nom:true,
-                id_centre:true
-                }
-                
-              }
-            }
-          }
+          centres: {
+            select: {
+              centre: {
+                select: {
+                  nom: true,
+                  id_centre: true,
+                },
+              },
+            },
+          },
+          categorie: {
+            select: {
+              id: true,
+              libelle: true,
+              description: true,
+            },
+          },
         },
       });
       if (!concours) {
@@ -532,6 +544,13 @@ static async CreateConcours(req, res) {
             date_fin: true,
             nombre_postes: true,
             _count: { select: { inscription: true } },
+            categorie: {
+              select: {
+                id: true,
+                libelle: true,
+                description: true,
+              },
+            },
           },
         }),
         prisma.concours.count(),
@@ -818,7 +837,6 @@ static async CreateConcours(req, res) {
     try {
       const { id_paiement, id_candidat, status } = req.body;
 
-
       const [candidat, paiement] = await Promise.all([
         prisma.candidat.findUnique({ where: { id_candidat } }),
         prisma.paiement.findUnique({ where: { id_paiement } }),
@@ -848,56 +866,301 @@ static async CreateConcours(req, res) {
 
   // methode de test pour verifier si la generation passe
   static async PrintReceipt(req, res) {
-  const data = {
-    centre: "Ouagadougou",
-    concours: "Eaux et Forêts",
-    nom: "YOBI",
-    prenom: "Cheick Omar",
-    date_naissance: "20/08/2004",
-    lieu_naissance: "Ouagadougou",
-    sexe: "M",
-    cnib: "B15333744",
-    telephone: "50783257",
-qr: JSON.stringify({
-  nom: "BA",
-  prenom: "yobi"
-})
-  };
+    const data = {
+      centre: "Ouagadougou",
+      concours: "Eaux et Forêts",
+      nom: "Doe",
+      prenom: "John",
+      date_naissance: "20/08/2004",
+      lieu_naissance: "Ouagadougou",
+      sexe: "M",
+      cnib: "B15333744",
+      telephone: "50783257",
+      qr: JSON.stringify({
+        nom: "BA",
+        prenom: "yobi",
+      }),
+    };
 
-  await generateReceipt(data, res);
-}
-static async DeleteCandidat(req,res){
-  try{
-    const{id_candidat} = req.body;
-    const candidat = await prisma.candidat.findUnique({
-      where:{id_candidat}
-    }); 
+    await generateReceipt(data, res);
+  }
+  static async DeleteCandidat(req, res) {
+    try {
+      const { id_candidat } = req.body;
+      const candidat = await prisma.candidat.findUnique({
+        where: { id_candidat },
+      });
 
-    if(!candidat) return res.status(404).json({error:'Candidat non trouver'});
+      if (!candidat)
+        return res.status(404).json({ error: "Candidat non trouver" });
 
-    await prisma.candidat.update({
-    where:{id_candidat},
-    data:{
-      deletedAt: new Date()
+      await prisma.candidat.update({
+        where: { id_candidat },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      return res
+        .status(200)
+        .json({ message: "candidat supprimer avec succes" });
+    } catch (err) {
+      return res.status(500).json({ error: "une erreur est survenue" });
     }
-    });
-
-    return res.status(200).json({message:'candidat supprimer avec succes'});
-
   }
-  catch(err){
-        return res.status(500).json({error:'une erreur est survenue'});
+
+  static async CreateCategorie(req, res) {
+    try {
+      const { libelle } = req.body;
+
+      const libelles = (Array.isArray(libelle) ? libelle : libelle.split(","))
+        .map((l) => l.trim())
+        .filter(Boolean);
+
+      const categorieExist = await prisma.categorieConcours.findUnique({
+        where: {
+          libelle: {
+            in: libelles,
+            mode: "insensitive",
+          },
+        },
+        select: {
+          libelle: true,
+        },
+      });
+      if (categorieExist.length > 0) {
+        const doublons = categorieExist.map((c) => c.libelle).join(", ");
+
+        return res.status(409).json({
+          message: `plusieurs doublons trouves: ${doublons}`,
+        });
+      }
+
+      // creons la categories maintenant separer par les virgules
+
+      await prisma.$transaction(async (tx) => {
+        const categorie = await tx.categorieConcours.createMany({
+          data: libelles.map((l) => ({ libelle: l })),
+          skipDuplicates: true,
+        });
+        return categorie;
+      });
+
+      return res.status(201).json({
+        message: "categorie de concours crerr avec succes",
+      });
+    } catch (err) {
+      console.log("une erreur est survenue ...", err);
+      return res.status(500).json({
+        error: "une erreur est survenue",
+      });
+    }
   }
-}
-static async CreateLieuxComposition (){}
+  static async DeleteCategorie(req, res) {
+    try {
+      const id_categorie = parseInt(req.params.id_categorie);
+      if (!id_categorie)
+        return res
+          .status(400)
+          .json({ error: "la reference de l'id est manquante" });
 
-static async repartitionParcentre(req,res){
+      const categorie = await prisma.categorieConcours.findUnique({
+        where: { id_categorie },
+      });
+      if (!categorie)
+        return res.status(404).json({ error: "Aucune categorie trouvee" });
 
-}
+      await prisma.categorieConcours.delete({
+        where: { id_categorie },
+      });
+      for (let page = 1; page++; page <= 10) {
+        const cacheKey = `categorie:page:${page}:limit:10`;
+        await redis.del(cacheKey);
+      }
 
-static async GetListes(req,res){
+      return res
+        .status(200)
+        .json({ message: "categorie supprimer avec succces" });
+    } catch (err) {
+      return res.status(500).json({ error: "une erreur est survenue" });
+    }
+  }
+  static async UpdateCategorie(req, res) {
+    try {
+      const { id, libelle } = req.body;
 
-}
+      const categorie = await prisma.findUnique({ where: { id } });
+      if (!categorie)
+        return res.status(404).json({ error: "Aucune categorie trouvee" });
+
+      await prisma.$transaction(async (tx) => {
+        const update = tx.candidat.update({
+          where: { id },
+          data: {
+            libelle: libelle ?? categorie.libelle,
+          },
+        });
+        return update;
+      });
+
+      for(let page=1; page++; page<=10){
+        const cacheKey = `categorieConcours:${page}:limit:${limit}`;
+        await redis.del(cacheKey);
+      }
+      return res
+        .status(200)
+        .json({ message: "Categorie modifier avec succes" });
+    } catch (err) {
+      return res.status(500).json({ error: "une erreur est survenue" });
+    }
+  }
+
+  static async GetCategorieConcours(req, res) {
+    try {
+      const page = parseInt(req.params.page) || 1;
+      const limit = 10;
+      const skip = (page - 1) * limit;
+
+      const cacheKey = `categorieConcours:${page}:limit:${limit}`;
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        // console.log('cache recuperer',cached)
+        return res.status(200).json(JSON.parse(cached));
+
+      }
+
+      const [concours, total] = await Promise.all([
+        await prisma.categorieConcours.findMany({
+          take: limit,
+          skip,
+          orderBy: { createdDate: "desc" },
+          select: {
+            id: true,
+            libelle: true,
+            concours: {
+              select: {
+                id_concours: true,
+                nom: true,
+              },
+            },
+          },
+        }),
+        await prisma.categorieConcours.count(),
+      ]);
+
+      if (!concours) {
+        return res.status(404).json({ error: "aucun concours trouver" });
+      }
+
+      const response = {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        data: concours,
+      };
+
+      await redis.set(cacheKey, JSON.stringify(response), "EX", 60);
+      return res.status(200).json(response);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: "une erreur est survenue" });
+    }
+  }
+
+  // comment update
+
+  async UpdateCategorieConcours(req, res) {
+    try {
+      const { id_categorie, libelle, description } = req.body;
+
+      const categorie = await prisma.categorieConcours.findUnique({
+        where: { where: { id: id_categorie } },
+      });
+      if (!categorie)
+        return res.status(404).json({ error: "Aucune categorie trouver" });
+      await prisma.categorieConcours.update({
+        where: {
+          where: { id: id_categorie },
+        },
+        data: {
+          libelle: libelle ?? categorie.libelle,
+          description: description ?? categorie.description,
+          lastModifiedBy: req.admin.id,
+          lastModifiedDate: new Date(),
+        },
+      });
+
+      for (let page = 1; page <= 10; page++) {
+        const cacheKey = `categorie:page:${page}:limit:10`;
+        await redis.del(cacheKey);
+      }
+
+      return res
+        .status(200)
+        .json({ message: "categorie modifier avec succes" });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ erro: "une erreur est survenue" });
+    }
+  }
+
+  static async GetCategorie(req, res) {
+    try {
+      const page = parseInt(req.params.page) || 1;
+      const limit = 10;
+      const skip = (page - 1) * limit;
+
+      const cacheKey = `categorie:page:${page}:limit:${limit}`;
+
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        console.log(" Cache hit pour categorie");
+        return res.status(200).json(JSON.parse(cached));
+      }
+
+      console.log("Cache miss pour categorie → DB call");
+
+      const [categorie, total] = await Promise.all([
+        prisma.categorieConcours.findMany({
+          take: limit,
+          skip,
+          select: {
+            id: true,
+            libelle: true,
+            description: true,
+            flgActif: true,
+          },
+        }),
+        prisma.categorieConcours.count(),
+      ]);
+
+      if (!categorie || categorie.length === 0) {
+        return res.status(404).json({ message: "Aucune categorie trouvee" });
+      }
+
+      const response = {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        data: categorie,
+      };
+
+      await redis.set(cacheKey, JSON.stringify(response), "EX", 60);
+
+      return res.status(200).json(response);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "une erreur est survenue" });
+    }
+  }
+
+  static async CreateLieuxComposition() {}
+
+  static async repartitionParcentre(req, res) {}
+
+  static async GetListes(req, res) {}
 
   static async Logout() {}
 }
