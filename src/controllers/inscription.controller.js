@@ -2,14 +2,14 @@ import { prisma } from "../prisma.js";
 
 export class InscriptionController {
 
-  // ─── POST /api/inscriptions ───────────────────────────────
+  
   async sInscrire(req, res) {
     try {
       const id_candidat = req.user.id;
-      const { id_concours } = req.body;
+      const id_concours = parseInt(req.body.id_concours);
 
-      if (!id_concours) {
-        return res.status(400).json({ error: "id_concours est requis" });
+      if (!id_concours || isNaN(id_concours)) {
+        return res.status(400).json({ error: "id_concours invalide" });
       }
 
       const concours = await prisma.concours.findUnique({
@@ -20,7 +20,7 @@ export class InscriptionController {
         return res.status(404).json({ error: "Concours introuvable" });
       }
 
-      if (concours.statut_concours !== "ouvert") {
+      if (concours.statut_concours !== "OUVERT") {
         return res.status(400).json({
           error: "Ce concours n'est plus ouvert aux inscriptions",
         });
@@ -33,19 +33,17 @@ export class InscriptionController {
         });
       }
 
-      // Vérifier si déjà inscrit — peu importe le statut
       const dejaInscrit = await prisma.inscription.findFirst({
         where: { id_candidat, id_concours },
       });
 
       if (dejaInscrit) {
-        // Message précis selon le statut
-        const messageStatut = dejaInscrit.statut_inscription === "validee"
+        const messageStatut = dejaInscrit.statut_inscription === "VALIDEE"
           ? "Vous êtes déjà inscrit et votre paiement est validé"
           : "Vous avez déjà une inscription en attente de paiement";
 
         return res.status(409).json({
-          error: messageStatut,
+          error:          messageStatut,
           id_inscription: dejaInscrit.id_inscription,
         });
       }
@@ -54,7 +52,7 @@ export class InscriptionController {
         data: {
           id_candidat,
           id_concours,
-          statut_inscription: "en_attente",
+          statut_inscription: "EN_ATTENTE",
         },
         select: {
           id_inscription:     true,
@@ -70,7 +68,7 @@ export class InscriptionController {
       });
 
       return res.status(201).json({
-        message: "Inscription créée — en attente de paiement",
+        message: "Inscription créée , en attente de paiement",
         data: {
           id_inscription:     inscription.id_inscription,
           date_inscription:   inscription.date_inscription,
@@ -91,11 +89,14 @@ export class InscriptionController {
     }
   }
 
-  // ─── GET /api/inscriptions/:id_inscription ────────────────
   async getInscription(req, res) {
     try {
-      const id_candidat        = req.user.id;
-      const { id_inscription } = req.params;
+      const id_candidat    = req.user.id;
+      const id_inscription = parseInt(req.params.id_inscription);
+
+      if (isNaN(id_inscription)) {
+        return res.status(400).json({ error: "id_inscription invalide" });
+      }
 
       const inscription = await prisma.inscription.findFirst({
         where: { id_inscription, id_candidat },
@@ -140,7 +141,7 @@ export class InscriptionController {
           statut_inscription:  inscription.statut_inscription,
           concours:            inscription.concours,
           paiement,
-          recepisse_disponible: paiement?.statut_paiement === "reussi",
+          recepisse_disponible: paiement?.statut_paiement === "REUSSI",
         },
       });
 

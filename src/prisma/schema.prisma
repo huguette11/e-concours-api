@@ -57,6 +57,11 @@ enum statut_paiement {
   ECHOUE
   ATTENTE
 }
+enum StatutInscription {
+  EN_ATTENTE
+  VALIDEE
+  ANNULEE
+}
 
 // ─────────────────────────────────────────────
 // ADMIN
@@ -123,11 +128,11 @@ model candidat {
   nom_jeune_fille String?      @db.VarChar(100)
   sexe            Sexe
   date_naissance  DateTime     @db.Date
-  lieu_naissance  String?      @db.VarChar(150)
-  pays_naissance  String?      @db.VarChar(150)
+  lieu_naissance  String     @db.VarChar(150)
+  pays_naissance  String     @db.VarChar(150)
   numero_cnib     String       @unique @db.VarChar(50)
-  date_delivrance DateTime?    @db.Date
-  telephone       String?      @db.VarChar(20)
+  date_delivrance DateTime    @db.Date
+  telephone       String      @db.VarChar(20)
   email           String       @unique @db.VarChar(150)
   mot_de_passe    String       @db.VarChar(255)
   recepisse       String?      @db.VarChar(500)
@@ -159,7 +164,7 @@ model concours {
   annee             Int
   date_debut        DateTime          @db.Date
   date_fin          DateTime          @db.Date
-  statut_concours   String            @default("fermé") @db.VarChar(50)
+  statut_concours   String            @default("Attente") @db.VarChar(50)
   id_admin          String?           @db.Uuid
   update_at         DateTime          @default(now()) @db.Timestamp(6)
   date_creation     DateTime          @default(now()) @db.Timestamp(6)
@@ -208,7 +213,7 @@ model document {
 model inscription {
   id_inscription     Int      @id @default(autoincrement())
   date_inscription   DateTime @default(now()) @db.Timestamp(6)
-  statut_inscription String   @default("en_attente") @db.VarChar(50)
+  statut_inscription StatutInscription  
   id_candidat        String   @db.Uuid
   id_concours        Int
   candidat candidat   @relation(fields: [id_candidat], references: [id_candidat], onDelete: Cascade, onUpdate: NoAction)

@@ -3,14 +3,13 @@ import bcrypt from "bcrypt";
 
 export class CandidatController {
 
-  
-  async getProfil(req, res) {
+ 
+ async getProfil(req, res) {
     try {
       const id_candidat = req.user.id;
 
       const candidat = await prisma.candidat.findUnique({
         where: { id_candidat },
-        
         select: {
           nom:             true,
           prenom:          true,
@@ -55,7 +54,6 @@ export class CandidatController {
     }
   }
 
-  
   async updateProfil(req, res) {
     try {
       const id_candidat = req.user.id;
@@ -86,7 +84,6 @@ export class CandidatController {
       if (ministere)       dataToUpdate.ministere       = ministere;
       if (matricule)       dataToUpdate.matricule       = matricule;
 
-     
       if (nouveau_mot_de_passe) {
         if (!ancien_mot_de_passe) {
           return res.status(400).json({
@@ -98,20 +95,23 @@ export class CandidatController {
           candidat.mot_de_passe
         );
         if (!correct) {
-          return res.status(401).json({ error: "Ancien mot de passe incorrect" });
+          return res.status(401).json({
+            error: "Ancien mot de passe incorrect",
+          });
         }
         dataToUpdate.mot_de_passe = await bcrypt.hash(nouveau_mot_de_passe, 10);
       }
 
       if (Object.keys(dataToUpdate).length === 0) {
-        return res.status(400).json({ error: "Aucune donnée à mettre à jour" });
+        return res.status(400).json({
+          error: "Aucune donnée à mettre à jour",
+        });
       }
 
       const updated = await prisma.candidat.update({
         where: { id_candidat },
-        data: dataToUpdate,
+        data:  dataToUpdate,
         select: {
-          id_candidat:     true,
           nom:             true,
           prenom:          true,
           email:           true,
@@ -135,7 +135,7 @@ export class CandidatController {
     }
   }
 
-  
+
   async getMesCandidatures(req, res) {
     try {
       const id_candidat = req.user.id;
@@ -145,23 +145,22 @@ export class CandidatController {
         include: {
           concours: {
             select: {
-              nom:              true,
-              type:             true,
+              nom:               true,
+              type:              true,
               frais_inscription: true,
-              statut_concours:  true,
+              statut_concours:   true,
             },
           },
-          
           paiement: {
             select: {
-              statut_paiement:      true,
+              statut_paiement:       true,
               reference_transaction: true,
-              mode_paiement:        true,
-              date_paiement:        true,
-              montant:              true,
+              mode_paiement:         true,
+              date_paiement:         true,
+              montant:               true,
             },
             orderBy: { date_paiement: "desc" },
-            take: 1, // on prend le dernier paiement
+            take: 1,
           },
         },
         orderBy: { date_inscription: "desc" },
@@ -170,13 +169,11 @@ export class CandidatController {
       const data = inscriptions.map((insc) => {
         const dernierPaiement = insc.paiement[0] ?? null;
         return {
-          id_inscription:     insc.id_inscription,
-          date_inscription:   insc.date_inscription,
-          statut_inscription: insc.statut_inscription,
-          concours:           insc.concours,
-          paiement:           dernierPaiement,
-          recepisse_disponible:
-            dernierPaiement?.statut_paiement === "reussi",
+          date_inscription:    insc.date_inscription,
+          statut_inscription:  insc.statut_inscription,
+          concours:            insc.concours,
+          paiement:            dernierPaiement,
+          recepisse_disponible: dernierPaiement?.statut_paiement === "REUSSI",
         };
       });
 
@@ -195,7 +192,11 @@ export class CandidatController {
   async getRecepisse(req, res) {
     try {
       const id_candidat    = req.user.id;
-      const { id_inscription } = req.params;
+      const id_inscription = parseInt(req.params.id_inscription);
+
+      if (isNaN(id_inscription)) {
+        return res.status(400).json({ error: "id_inscription invalide" });
+      }
 
       const inscription = await prisma.inscription.findFirst({
         where: { id_inscription, id_candidat },
@@ -214,9 +215,9 @@ export class CandidatController {
 
       const paiement = inscription.paiement[0] ?? null;
 
-      if (!paiement || paiement.statut_paiement !== "reussi") {
+      if (!paiement || paiement.statut_paiement !== "REUSSI") {
         return res.status(404).json({
-          error: "Récépissé non disponible — paiement en attente",
+          error: "Récépissé non disponible, paiement en attente",
         });
       }
 
@@ -225,15 +226,14 @@ export class CandidatController {
         select: { nom: true, prenom: true, numero_cnib: true },
       });
 
-      //  TODO étape suivante : générer le vrai PDF 
       return res.status(200).json({
         message: "Données récépissé",
         data: {
-          candidat:             `${candidat.nom} ${candidat.prenom}`,
-          numero_cnib:          candidat.numero_cnib,
-          concours:             inscription.concours.nom,
-          date_inscription:     inscription.date_inscription,
-          montant_paye:         paiement.montant,
+          candidat:              `${candidat.nom} ${candidat.prenom}`,
+          numero_cnib:           candidat.numero_cnib,
+          concours:              inscription.concours.nom,
+          date_inscription:      inscription.date_inscription,
+          montant_paye:          paiement.montant,
           reference_transaction: paiement.reference_transaction,
         },
       });
@@ -245,7 +245,7 @@ export class CandidatController {
   }
 
   
-  async getResultats(req, res) {
+    async getResultats(req, res) {
     try {
       const id_candidat = req.user.id;
 
@@ -260,16 +260,41 @@ export class CandidatController {
               type_examen: true,
               coefficient: true,
               concours: {
-                select: { nom: true },
+                select: { nom: true, type: true },
               },
             },
           },
         },
       });
 
+      // Grouper par concours
+      const parConcours = resultats.reduce((acc, r) => {
+        const nomConcours = r.examen.concours.nom;
+
+        if (!acc[nomConcours]) {
+          acc[nomConcours] = {
+            concours: r.examen.concours,
+            examens:  [],
+          };
+        }
+
+        acc[nomConcours].examens.push({
+          intitule:         r.examen.intitule,
+          type_examen:      r.examen.type_examen,
+          date_examen:      r.examen.date_examen,
+          lieu:             r.examen.lieu,
+          coefficient:      r.examen.coefficient,
+          note:             r.note,
+          moyenne_generale: r.moyenne_generale,
+          statut:           r.statut,
+        });
+
+        return acc;
+      }, {});
+
       return res.status(200).json({
         message: "Résultats récupérés",
-        data: resultats,
+        data:    Object.values(parConcours),
       });
 
     } catch (err) {
