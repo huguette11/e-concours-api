@@ -530,6 +530,12 @@ export class AdminController {
       const limit = 10;
       const skip = (page - 1) * limit;
 
+      const cacheKey = `concours:page${page}:limit:${limit}`;
+      const concoursCached = await redis.get(cacheKey);
+      if(concoursCached){
+        return res.status(200).json(JSON.parse(concoursCached));
+      }
+
       const [concours, total] = await Promise.all([
         prisma.concours.findMany({
           skip,
@@ -556,13 +562,15 @@ export class AdminController {
         prisma.concours.count(),
       ]);
 
-      res.status(200).json({
+      const response = {
         page,
         limit,
         total,
         totalPages: Math.ceil(total / limit),
         data: concours,
-      });
+      };
+      await redis.set(cacheKey,JSON.stringify(response),'EX',300)
+      res.status(200).json(response);
     } catch (err) {
       console.error("Une erreur est survenue:", err);
       res.status(500).json({ error: "Impossible de récupérer les concours." });
@@ -696,99 +704,118 @@ export class AdminController {
   }
 
   static async ListesPaiements(req, res) {
-    try {
-      const {
-        statut_paiement,
-        mode_paiement,
-        annee_concours,
-        nom_candidat,
-        prenom_candidat,
-        page = 1,
-        limit = 10,
-      } = req.query;
+  try {
+    const {
+      statut_paiement,
+      mode_paiement,
+      annee_concours,
+      nom_candidat,
+      prenom_candidat,
+      page = 1,
+      limit = 10,
+    } = req.query;
 
-      const skip = (page - 1) * limit;
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
-      const where = {};
+    const cacheKey = `paiements:${pageNumber}:${limitNumber}:${statut_paiement || ""}:${mode_paiement || ""}:${annee_concours || ""}:${nom_candidat || ""}:${prenom_candidat || ""}`;
 
-      if (statut_paiement) where.statut_paiement = statut_paiement;
-      if (mode_paiement) where.mode_paiement = mode_paiement;
-      if (annee_concours) {
-        where.inscription = {
-          concours: { annee: parseInt(annee_concours) },
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached));
+    }
+
+    const where = {};
+
+    if (statut_paiement) where.statut_paiement = statut_paiement;
+    if (mode_paiement) where.mode_paiement = mode_paiement;
+
+    if (annee_concours) {
+      where.inscription = {
+        concours: { annee: parseInt(annee_concours) },
+      };
+    }
+
+    if (nom_candidat || prenom_candidat) {
+      where.inscription = {
+        ...where.inscription,
+        candidat: {},
+      };
+
+      if (nom_candidat) {
+        where.inscription.candidat.nom = {
+          contains: nom_candidat,
+          mode: "insensitive",
         };
       }
-      if (nom_candidat || prenom_candidat) {
-        where.inscription = {
-          ...where.inscription,
-          candidat: {},
-        };
-        if (nom_candidat)
-          where.inscription.candidat.nom = {
-            contains: nom_candidat,
-            mode: "insensitive",
-          };
-        if (prenom_candidat)
-          where.inscription.candidat.prenom = {
-            contains: prenom_candidat,
-            mode: "insensitive",
-          };
-      }
 
-      const [paiements, nombrePaiement] = await Promise.all([
-        prisma.paiement.findMany({
-          where,
-          skip: parseInt(skip),
-          take: parseInt(limit),
-          orderBy: { date_paiement: "desc" },
-          select: {
-            id_paiement: true,
-            montant: true,
-            date_paiement: true,
-            mode_paiement: true,
-            reference_transaction: true,
-            statut_paiement: true,
-            inscription: {
-              select: {
-                id_inscription: true,
-                statut_inscription: true,
-                date_inscription: true,
-                candidat: {
-                  select: {
-                    id_candidat: true,
-                    nom: true,
-                    prenom: true,
-                    email: true,
-                  },
+      if (prenom_candidat) {
+        where.inscription.candidat.prenom = {
+          contains: prenom_candidat,
+          mode: "insensitive",
+        };
+      }
+    }
+
+    const [paiements, nombrePaiement] = await Promise.all([
+      prisma.paiement.findMany({
+        where,
+        skip,
+        take: limitNumber,
+        orderBy: { date_paiement: "desc" },
+        select: {
+          id_paiement: true,
+          montant: true,
+          date_paiement: true,
+          mode_paiement: true,
+          reference_transaction: true,
+          statut_paiement: true,
+          inscription: {
+            select: {
+              id_inscription: true,
+              statut_inscription: true,
+              date_inscription: true,
+              candidat: {
+                select: {
+                  id_candidat: true,
+                  nom: true,
+                  prenom: true,
+                  email: true,
                 },
-                concours: {
-                  select: {
-                    id_concours: true,
-                    nom: true,
-                    annee: true,
-                  },
+              },
+              concours: {
+                select: {
+                  id_concours: true,
+                  nom: true,
+                  annee: true,
                 },
               },
             },
           },
-        }),
-        prisma.paiement.count({ where }),
-      ]);
+        },
+      }),
+      prisma.paiement.count({ where }),
+    ]);
 
-      return res.status(200).json({
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: nombrePaiement,
-        totalPages: Math.ceil(nombrePaiement / limit),
-        data: paiements,
-      });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({
-        error: "Erreur lors de la récupération des paiements",
-      });
-    }
+    const response = {
+      page: pageNumber,
+      limit: limitNumber,
+      total: nombrePaiement,
+      totalPages: Math.ceil(nombrePaiement / limitNumber),
+      data: paiements,
+    };
+
+    await redis.set(cacheKey, JSON.stringify(response), "EX", 60);
+
+    return res.status(200).json(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "Erreur lors de la récupération des paiements",
+    });
   }
+}
 
   static async DetailPaiement(req, res) {
     try {
@@ -901,6 +928,11 @@ export class AdminController {
         },
       });
 
+          for(let page=1; page++; page<=10){
+        const cacheKey = `candidat:${page}:limit:${limit}`;
+        await redis.del(cacheKey);
+      }
+
       return res
         .status(200)
         .json({ message: "candidat supprimer avec succes" });
@@ -945,7 +977,10 @@ export class AdminController {
         });
         return categorie;
       });
-
+          for(let page=1; page++; page<=10){
+        const cacheKey = `categorieConcours:${page}:limit:${limit}`;
+        await redis.del(cacheKey);
+      }
       return res.status(201).json({
         message: "categorie de concours crerr avec succes",
       });

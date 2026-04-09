@@ -4,23 +4,46 @@ import { ValidateRequest } from "../middleware/ValidateRequest.js";
 import { AdminController } from "../controllers/Admin.controller.js";
 import { AdminMiddleware } from "../middleware/Admin.Middleware.js";
 import { ConcoursDto } from "../Dtos/ConcoursDto.js";
+import { CategorieDto } from "../Dtos/CategorieDto.js";
+import { PaiementController } from "../controllers/Paiement.controller.js";
 
 const router = express.Router();
 
-router.post("/login",AdminDto.ValidateLogin(), ValidateRequest.handle, AdminController.Login);
+// Helper validation
+const validate = (dto) => [dto, ValidateRequest.handle];
 
-router.post("/register",AdminDto.ValidateRegister(),ValidateRequest.handle,AdminController.Register);
+// Routes publiques (sans middleware)
+router.post("/login", ...validate(AdminDto.ValidateLogin()), AdminController.Login);
+router.post("/register", ...validate(AdminDto.ValidateRegister()), AdminController.Register);
 
-router.get("/dashboard", AdminMiddleware.handle, AdminController.Dashboard);
-router.get("/concours",AdminMiddleware.handle, AdminController.GetAllConcours);
-router.get("/concours/:id_concours",AdminMiddleware.handle, AdminController.DetailConcours);
-router.delete("/delete-concours",AdminMiddleware.handle, AdminController.DeleteConcours);
-router.put("/update-concours",AdminMiddleware.handle, AdminController.UpdateConcours);
-router.post("/create-centre",AdminDto.ValidateCreateCentre(),AdminMiddleware.handle, AdminController.CreateCentre);
-router.post("/create-concours",AdminMiddleware.handle, AdminController.CreateConcours);
 
-router.get(
-  "/receipt",
-  AdminController.PrintReceipt
-);
+router.use(AdminMiddleware.handle);
+
+router.get("/dashboard", AdminController.Dashboard);
+//concours
+router.get("/concours", AdminController.GetAllConcours);
+router.get("/concours/:id_concours", AdminController.DetailConcours);
+router.delete("/delete-concours", AdminController.DeleteConcours);
+router.put("/update-concours", AdminController.UpdateConcours);
+router.post("/create-concours", AdminController.CreateConcours);
+
+
+
+router.get("/receipt", AdminController.PrintReceipt);
+
+// Routes protégées avec validation
+router.post("/create-centre", ...validate(AdminDto.ValidateCreateCentre()), AdminController.CreateCentre);
+
+// categorie concours
+router.delete("/delete-categorie-concours", AdminController.DeleteCategorie);
+router.post("/create-categorie-concours", ...validate(CategorieDto.CreateCategorie()), AdminController.CreateCategorie);
+router.put("/update-categorie-concours",...validate(CategorieDto.UpdateCategorie()),AdminController.UpdateCategorie);
+router.get('/concours-by-categorie',AdminController.GetCategorieConcours);
+router.get('/get-categorie',AdminController.GetCategorie);
+
+/// payer coter admin aussi 
+
+router.post('/init-payment',PaiementController.Init);
+
+
 export default router;

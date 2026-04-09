@@ -5,7 +5,7 @@ import adminRoutes from "./routes/admin.route.js";
 import cors from "cors";
 import { swaggerDocs } from "./swagger.js";
 import helmet from "helmet";
-
+import { connection } from "./config/redis.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -44,6 +44,11 @@ app.get("/", (req, res) => {
   res.send("API e-concours opérationnelle");
 });
 
+// await connection.set("test", "ioredis fonctionne !");
+// const val = await connection.get("test");
+// console.log(val); // ioredis fonctionne !
+
 app.listen(PORT, () => {
+
   console.log(`Server is running on port ${PORT}`);
 });
