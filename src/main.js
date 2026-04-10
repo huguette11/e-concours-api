@@ -1,4 +1,4 @@
-import express from "express";
+ import express from "express";
 import candidatRoutes from "./routes/candidat.route.js";
 import authRoutes from "./routes/auth.route.js";
 import adminRoutes from "./routes/admin.route.js"; 
@@ -6,8 +6,13 @@ import cors from "cors";
 import { swaggerDocs } from "./swagger.js";
 import helmet from "helmet";
 import { connection } from "./config/redis.js";
+import inscriptionRoutes from "./routes/inscription.route.js";
+
+
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 4000;
 
 const allowedOrigins = [
   "http://localhost:3000",   
@@ -33,7 +38,7 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
 
-
+app.use("/inscriptions", inscriptionRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/candidats", candidatRoutes);
 app.use("/admin", adminRoutes);
