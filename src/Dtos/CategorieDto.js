@@ -6,13 +6,30 @@ export class CategorieDto {
       body("liblle")
         .notEmpty()
         .withMessage("Le libelle est requis")
-        .isString()
+        .isString() 
         .withMessage("Le libelle doit etre en chaine de caractere"),
       body("description").optional(),
     ];
   }
 
   static UpdateCategorie() {
-    return [body("id").notEmpty().withMessage("Id est requis").isInt()];
+    return [
+      body("id")
+        .notEmpty()
+        .withMessage("Id est requis")
+        .isInt()
+        .withMessage("le type ne correspond pas au type attendu"),
+    ];
+  }
+
+  // au cas ou le frontend m'envoi la categorie par body  au lieu de params
+  static DeleteCategorie() {
+    return [
+      body("id_categorie")
+        .notEmpty()
+        .withMessage("Id est requis")
+        .isInt()
+        .withMessage("le type ne correspond pas au type attendu"),
+    ];
   }
 }

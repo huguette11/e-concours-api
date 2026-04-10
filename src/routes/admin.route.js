@@ -43,7 +43,7 @@ router.get('/get-categorie',AdminController.GetCategorie);
 
 /// payer coter admin aussi 
 
-router.post('/init-payment',PaiementController.Init);
+
 
 
 export default router;

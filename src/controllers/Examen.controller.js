@@ -2,8 +2,7 @@ import { prisma } from "../prisma.js";
 
 export class ExamenController {
 
-  // ─── GET /api/examens/:id_concours ───────────────────────
-  // Voir les examens d'un concours
+
   async getExamensDuConcours(req, res) {
     try {
       const { id_concours } = req.params;
@@ -45,8 +44,7 @@ export class ExamenController {
     }
   }
 
-  // ─── GET /api/examens/detail/:id_examen ──────────────────
-  // Voir le détail d'un examen + résultats du candidat connecté
+
   async getExamen(req, res) {
     try {
       const id_candidat  = req.user.id;
@@ -109,8 +107,7 @@ export class ExamenController {
     }
   }
 
-  // ─── GET /api/examens/mes-resultats ──────────────────────
-  // Tous les résultats du candidat connecté
+
   async getMesResultats(req, res) {
     try {
       const id_candidat = req.user.id;

@@ -2,8 +2,6 @@ import cron from "node-cron";
 import { prisma } from "../prisma.js";
 
 export class Cron {
-
-
   async UpdateDateConcours() {
     cron.schedule("0 0 * * *", async () => {
       try {
@@ -27,5 +25,27 @@ export class Cron {
     });
   }
 
+  async DeleteOtp() {
+    cron.schedule("0 0 * * *", async () => {
+      try {
+        const today = new Date();
+        // today.setHours(0,0,0,0);
 
+        await prisma.candidat.updateMany({
+          where: {
+            otp: { not: null },
+            otp_expiration: { lt: today },
+          },
+          data: {
+            otp: null,
+            otp_expiration: null,
+          },
+        });
+      } catch (err) {
+        //voir mes erreurs
+
+        console.log('une erreur est survenue', err)
+      }
+    });
+  }
 }

@@ -7,8 +7,10 @@ import { swaggerDocs } from "./swagger.js";
 import helmet from "helmet";
 import { connection } from "./config/redis.js";
 import inscriptionRoutes from "./routes/inscription.route.js";
-
-
+import paiementRoutes from "./routes/paiement.route.js";
+import concoursRoutes from "./routes/concours.route.js";
+import { limiter } from "./middleware/rateLimiter.js";
+import { Cron } from "./cron/Cron.js";
 
 const app = express();
 
@@ -37,11 +39,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
+app.use(limiter)
 
 app.use("/inscriptions", inscriptionRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/candidats", candidatRoutes);
-app.use("/admin", adminRoutes);
+app.use("/api/candidats", candidatRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/payment",paiementRoutes)
+app.use("/api/concours",concoursRoutes)
 
 swaggerDocs(app, PORT);
 

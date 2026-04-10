@@ -1,5 +1,6 @@
 import { prisma } from "../prisma.js";
-
+import { connection as redis } from "../config/redis.js";
+;
 export class ConcoursController {
 
 
@@ -62,6 +63,7 @@ export class ConcoursController {
 
       const [concours, total] = await Promise.all([
         prisma.concours.findMany({
+          where:{       statut_concours: "OUVERT",},
           skip,
           take: limit,
           orderBy: { date_debut: "desc" },
@@ -86,6 +88,7 @@ export class ConcoursController {
         prisma.concours.count(),
       ]);
 
+      console.log(concours);
       res.status(200).json({
         page,
         limit,
@@ -100,63 +103,71 @@ export class ConcoursController {
   }
 
 
-  static async DetailConcours(req, res) {
-    try {
-      const id_concours = parseInt(req.params.id_concours);
+static async DetailConcours(req, res) {
+  try {
+    const id_concours = parseInt(req.params.id);
+    const cacheKey = `concours:detail:${id_concours}`;
 
-      const concours = await prisma.concours.findUnique({
-        where: { id_concours },
-        select: {
-          id_concours: true,
-          nom: true,
-          type: true,
-          description: true,
-          frais_inscription: true,
-          nombre_postes: true,
-          annee: true,
-          date_debut: true,
-          date_fin: true,
-          statut_concours: true,
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      // console.log("Cache hit pour concours detail");
+      return res.status(200).json(JSON.parse(cached));
+    }
 
-          examen: {
-            select: {
-              type_examen: true,
-              date_examen: true,
-              lieu: true,
-            },
-          },
-          _count: {
-            select: { inscription: true },
-          },
-          centres: {
-            select: {
-              centre: {
-                select: {
-                  nom: true,
-                  id_centre: true,
-                },
+    const concours = await prisma.concours.findUnique({
+      where: { id_concours ,
+     
+      },
+
+      select: {
+        id_concours: true,
+        nom: true,
+        type: true,
+        description: true,
+        frais_inscription: true,
+        nombre_postes: true,
+        annee: true,
+        date_debut: true,
+        date_fin: true,
+        statut_concours: true,
+        _count: {
+          select: { inscription: true },
+        },
+        centres: {
+          select: {
+            centre: {
+              select: {
+                nom: true,
+                id_centre: true,
               },
             },
           },
-          categorie: {
-            select: {
-              id: true,
-              libelle: true,
-              description: true,
-            },
+        },
+        categorie: {
+          select: {
+            id: true,
+            libelle: true,
+            description: true,
           },
         },
-      });
-      if (!concours) {
-        return res.status(404).json({ error: "aucun concours trouver" });
-      }
+      },
+    });
 
-      return res.status(200).json({ data: concours });
-    } catch (err) {
-      console.log("une erreur est survenue", err);
-      return res.status(500).json({ error: "une erreur est survenue" });
+    if (!concours) {
+      return res.status(404).json({ error: "Aucun concours trouvé" });
     }
+
+    const response = { data: concours };
+
+
+    await redis.set(cacheKey, JSON.stringify(response), "EX", 500);
+
+    return res.status(200).json(response);
+  } catch (err) {
+    console.log("Une erreur est survenue", err);
+    return res.status(500).json({ error: "Une erreur est survenue" });
   }
+}
 
   
 }

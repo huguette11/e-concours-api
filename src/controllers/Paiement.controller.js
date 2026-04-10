@@ -5,7 +5,8 @@ import { prisma } from "../prisma.js";
 export class PaiementController {
 static async Init(req, res) {
   try {
-    const { id_concours, id_candidat, id_inscription } = req.body;
+    const { id_concours, id_inscription } = req.body;
+    const {id_candidat} = req.user;
 
     const [concours, candidat, inscription, paiementExists] = await Promise.all([
       prisma.concours.findUnique({ where: { id_concours } }),
@@ -45,7 +46,7 @@ static async Init(req, res) {
     // Initialiser le paiement via YengaPay
     const reference = `CONC-${id_concours}-CAND-${id_candidat}-INS-${id_inscription}-${Date.now()}`;
     const yenga = new YengaPay({
-      title: "Frais inscription concours",
+      title: `Frais inscription ${concours.nom}` ,
       description: "Paiement de l'inscription",
       price: 800,
       reference: reference,
@@ -133,6 +134,9 @@ static async Init(req, res) {
       }
 
       return res.status(200).json({ received: true });
-    } catch (err) {}
+    } catch (err) {
+
+      console.log('une erreur est survenue', err)
+    }
   }
 }
