@@ -26,10 +26,10 @@ router.get("/concours/:id_concours", AdminController.DetailConcours);
 router.delete("/delete-concours", AdminController.DeleteConcours);
 router.put("/update-concours", AdminController.UpdateConcours);
 router.post("/create-concours", AdminController.CreateConcours);
+router.get('/concours/search',AdminController.SearchConcours);
+router.post('/concours/switch-status/:id_concours',AdminController.SwitchStatuConcours)
 
-
-
-router.get("/receipt", AdminController.PrintReceipt);
+// router.get("/receipt", AdminController.PrintReceipt);
 
 // Routes protégées avec validation
 router.post("/create-centre", ...validate(AdminDto.ValidateCreateCentre()), AdminController.CreateCentre);
@@ -40,6 +40,13 @@ router.post("/create-categorie-concours", ...validate(CategorieDto.CreateCategor
 router.put("/update-categorie-concours",...validate(CategorieDto.UpdateCategorie()),AdminController.UpdateCategorie);
 router.get('/concours-by-categorie',AdminController.GetCategorieConcours);
 router.get('/get-categorie',AdminController.GetCategorie);
+router.put('/paiement-status', AdminController.UpdadePaiemntStatus);
+router.get('/detail-paiement',AdminController.DetailPaiement);
+router.get('/liste-paiement',AdminController.ListesPaiements);
+
+router.get('/candidats/search',AdminController.SearchCandidat)
+
+
 
 /// payer coter admin aussi 
 

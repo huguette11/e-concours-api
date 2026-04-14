@@ -4,6 +4,7 @@ import { response } from "express";
 import jwt from "jsonwebtoken";
 import { contactTemplate } from "../services/templates/Mail/contactUs.js";
 import { sendMailContact } from "../config/mailer.js";
+import { connection } from "../config/redis.js";
 export class AuthController {
   constructor(notificationService) {
     this.notificationService = notificationService;
@@ -14,27 +15,45 @@ export class AuthController {
     this.ForgotPassword = this.ForgotPassword.bind(this);
     this.Logout = this.Logout.bind(this);
     this.ResendOtp = this.ResendOtp.bind(this);
+    this.VerifieNumber = this.VerifieNumber.bind(this);
+  }
+
+  async VerifieNumber(req, res) {
+    try {
+      const { tel } = req.body;
+      const cachekey = `verif-${tel}`;
+      this.notificationService.telephone = tel;
+      const otp = this.notificationService.genererOtp();
+      await connection.set(cachekey, JSON.stringify(cachekey));
+      await this.notificationService.envoyerOtpEmail(otp);
+    } catch (err) {
+      console.log("erreur", err);
+    }
   }
 
   async Login(req, res) {
     try {
-      const { email, mot_de_passe } = req.body;
+      const { telephone, mot_de_passe } = req.body;
 
-      if (!email || !mot_de_passe) {
-        return res.status(400).json({ error: "Email et mot de passe requis" });
+      if (!telephone || !mot_de_passe) {
+        return res
+          .status(400)
+          .json({ error: "telephone et mot de passe requis" });
       }
 
-      const candidat = await prisma.candidat.findUnique({ where: { email } });
+      const candidat = await prisma.candidat.findUnique({
+        where: { telephone:telephone },
+      });
 
       if (!candidat) {
         return res.status(404).json({ error: "Candidat non trouvé" });
       }
 
-      if (candidat.statut_compte !== "ACTIF") {
-        return res
-          .status(401)
-          .json({ error: "Veuillez vérifier votre compte pour continuer" });
-      }
+      // if (candidat.statut_compte !== "ACTIF") {
+      //   return res
+      //     .status(401)
+      //     .json({ error: "Veuillez vérifier votre compte pour continuer" });
+      // }
 
       const motDePasseCorrect = await bcrypt.compare(
         mot_de_passe,
@@ -142,6 +161,7 @@ export class AuthController {
           await this.notificationService.envoyerOtpTelephone(otp);
           break;
         case "mail":
+          await this.notificationService.envoyerOtpEmail(otp);
         default:
           await this.notificationService.envoyerOtpEmail(otp);
           break;
@@ -239,12 +259,10 @@ export class AuthController {
         { expiresIn: "24h" },
       );
 
-      return res
-        .status(200)
-        .json({
-          message: "code de verification envoyer avec succes",
-          token: refreshToken,
-        });
+      return res.status(200).json({
+        message: "code de verification envoyer avec succes",
+        token: refreshToken,
+      });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "une erreur est survenue" });

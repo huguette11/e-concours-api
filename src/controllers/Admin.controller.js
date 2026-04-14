@@ -1,7 +1,7 @@
 import { prisma } from "../prisma.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { generateReceipt } from "../services/Upload-file.service.js";
+import { generateReceipt, GenererListCandidat } from "../services/Upload-file.service.js";
 import { connection as redis } from "../config/redis.js";
 import { json } from "express";
 
@@ -648,7 +648,7 @@ export class AdminController {
   }
   // CRUD et gestions candidat
 
-  async SearchCandidat(req, res) {
+ static async SearchCandidat(req, res) {
     try {
       const { nom, prenom, sexe, pays_naissance, email, status, matricule } =
         req.query;
@@ -892,25 +892,25 @@ export class AdminController {
   }
 
   // methode de test pour verifier si la generation passe
-  static async PrintReceipt(req, res) {
-    const data = {
-      centre: "Ouagadougou",
-      concours: "Eaux et Forêts",
-      nom: "Doe",
-      prenom: "John",
-      date_naissance: "20/08/2004",
-      lieu_naissance: "Ouagadougou",
-      sexe: "M",
-      cnib: "B15333744",
-      telephone: "50783257",
-      qr: JSON.stringify({
-        nom: "BA",
-        prenom: "yobi",
-      }),
-    };
+  // static async PrintReceipt(req, res) {
+  //   const data = {
+  //     centre: "Ouagadougou",
+  //     concours: "Eaux et Forêts",
+  //     nom: "Doe",
+  //     prenom: "John",
+  //     date_naissance: "20/08/2004",
+  //     lieu_naissance: "Ouagadougou",
+  //     sexe: "M",
+  //     cnib: "B15333744",
+  //     telephone: "50783257",
+  //     qr: JSON.stringify({
+  //       nom: "BA",
+  //       prenom: "yobi",
+  //     }),
+  //   };
 
-    await generateReceipt(data, res);
-  }
+  //   await generateReceipt(data, res);
+  // }
   static async DeleteCandidat(req, res) {
     try {
       const { id_candidat } = req.body;
@@ -1105,7 +1105,7 @@ export class AdminController {
 
   // comment update
 
-  async UpdateCategorieConcours(req, res) {
+  static async UpdateCategorieConcours(req, res) {
     try {
       const { id_categorie, libelle, description } = req.body;
 
@@ -1191,11 +1191,384 @@ export class AdminController {
     }
   }
 
-  static async CreateLieuxComposition() {}
+  static async CreateLieuxComposition(req,res) {
+    try{
 
-  static async repartitionParcentre(req, res) {}
+    }
+    catch(err){
 
-  static async GetListes(req, res) {}
+    }
+  }
+
+  // verifie et repartie les centres
+
+      // elaborer un algo de repartition automatique 
+      // peut etre une ia qui sais 
+      //trier les candidats par centre en commencant par le premier centre en db 
+      // verifier pour chaque inscription <<valider>> le centre ou les centres compatibles
+      // trouver les candidats qui sont dans un centre precis 
+      // les repartir selon un quota du nombre de concours dans la ville 
+      //le quota sera determiner par le nombre d'inscrit par candidat et les repartirs equitablemeent 
+      // tout en laisssant une petie marge ie le quota ne dois pas etre completement atteint 
+      // sauf au cas ou un candidat precis n'a pas de lieux de compositions dans un centre precis
+
+      // apres sauvegarder les repatitions en bases de donnes et tirer une listes officielles de la repatition 
+      // ou encore plus precis chaque candidats recevra un sms et ou un mail pour l'indiquer le lieux de compositions 
+
+      /// aucune information n'est unitile a celui qui va  lire ma logique merci de me rectifier 
+      // si ma logique consomme trop de ressources ou si elle ne match pas avec le projets 
+      // merci de laisser un commentaire ou un mail (yobibah7295@gmail) pour m'apprendre de nouvelles methode choses ..
+      // et au passage j'aime bien apprendre , j'ai la soif d'apprentissage (~:~)
+
+      //nb: une marge de 10% est laisser pour repartition manuelle(a revoir ) pour eviiter les debordement au cas ou 
+      // le quota venait a etre inferieur au quota attendu 
+
+  static async repartirCandidats(req, res) {
+    const id_concours = parseInt(req.params.id_concours);
+    if (isNaN(id_concours)) {
+      return res.status(400).json({ error: 'id_concours invalide' });
+    }
+ 
+    try {
+     
+      const concours = await prisma.concours.findUnique({
+        where: { id_concours },
+      });
+      if (!concours) {
+        return res.status(404).json({ error: 'Concours introuvable' });
+      }
+ 
+      // await prisma.inscription.updateMany({
+      //   where:{statut_inscription:'EN_ATTENTE'},
+      //   data:{
+      //     statut_inscription:'VALIDEE'
+      //   }
+      // });
+      const inscriptions = await prisma.inscription.findMany({
+        where: {
+          id_concours,
+          statut_inscription: 'VALIDEE',
+        },
+        select: {
+          id_inscription: true,
+          id_candidat:    true,
+          id_centre:      true,
+          candidat: {
+            select: { nom: true, prenom: true },
+          },
+        },
+      });
+ 
+      if (inscriptions.length === 0) {
+        return res.status(404).json({
+          error: 'Aucune inscription valid3e pour ce concours',
+        });
+      }
+ 
+   
+      //       L'occupation compte TOUS les concours pour respecter
+      //       la capacité physique réelle du lieu
+      const lieux = await prisma.lieuxComposition.findMany({
+        include: {
+          centre: true,
+          compositions: {
+            select: { id_composer: true }, // on ne recup que le count
+          },
+        },
+      });
+ 
+      if (lieux.length === 0) {
+        return res.status(404).json({
+          error: 'Aucun lieu de composition disponible',
+        });
+      }
+ 
+      //       avec capacite effective (quota × marge) et occupation réelle
+      const MARGE = 0.90; // ne pas remplir au-delà de 90% du quota
+ 
+      // Map<centreId, LieuAvecCapacite[]>
+      const lieuxParCentre = new Map();
+ 
+      for (const lieu of lieux) {
+        if (!lieuxParCentre.has(lieu.id_centre)) {
+          lieuxParCentre.set(lieu.id_centre, []);
+        }
+        lieuxParCentre.get(lieu.id_centre).push({
+          id_lieux:  lieu.id_lieux,
+          nom:       lieu.nom,
+          id_centre: lieu.id_centre,
+          capacite:  Math.floor(lieu.quota * MARGE),
+          occupation: lieu.compositions.length, // occupation reelle multi-concours
+        });
+      }
+ 
+     
+      const aAffecter   = [];  // { id_candidat, id_concours, id_lieux }
+      const debordement = [];  // candidats sans place dans leur centre
+ 
+      for (const inscription of inscriptions) {
+        const lieuxDuCentre = lieuxParCentre.get(inscription.id_centre) ?? [];
+ 
+        // Chercher un lieu avec de la place dans le centre choisi
+        // Trier par occupation croissante pour équilibrer la charge
+        const lieu = lieuxDuCentre
+          .filter(l => l.occupation < l.capacite)
+          .sort((a, b) => a.occupation - b.occupation)[0];
+ 
+        if (lieu) {
+          lieu.occupation++;
+          aAffecter.push({
+            id_candidat: inscription.id_candidat,
+            id_concours,
+            id_lieux:    lieu.id_lieux,
+          });
+        } else {
+          debordement.push(inscription);
+        }
+      }
+ 
+      // gerer et eviter les debordements
+      //       Chercher dans n'importe quel centre, lieu le moins chargé
+      let forceAffectes = 0;
+ 
+      for (const inscription of debordement) {
+        // Tous les lieux tieer par taux de remplissage (occupation/capacite)
+        const tousLesLieux = [...lieuxParCentre.values()]
+          .flat()
+          .sort((a, b) => (a.occupation / a.capacite) - (b.occupation / b.capacite));
+ 
+        // D'abord les lieux encore dans la marge
+        let lieu = tousLesLieux.find(l => l.occupation < l.capacite);
+ 
+        // Si tout est plein, forcer dans le lieu le moins rempli (dépasse la marge)
+        if (!lieu) {
+          lieu = tousLesLieux[0];
+          forceAffectes++;
+        }
+ 
+        if (lieu) {
+          lieu.occupation++;
+          aAffecter.push({
+            id_candidat: inscription.id_candidat,
+            id_concours,
+            id_lieux:    lieu.id_lieux,
+          });
+        }
+      }
+ 
+ 
+      //       On supprime d'abord les anciennes répartitions de ce concours
+      //       pour permettre de relancer sans doublons
+      const [suppression, creation] = await prisma.$transaction([
+        prisma.composer.deleteMany({
+          where: { id_concours },
+        }),
+        prisma.composer.createMany({
+          data: aAffecter,
+        }),
+      ]);
+ 
+    
+      const resumeParLieu = {};
+      for (const affectation of aAffecter) {
+        const lieu = lieux.find(l => l.id_lieux === affectation.id_lieux);
+        const cle  = `[${lieu.centre.nom}] ${lieu.nom}`;
+        resumeParLieu[cle] = (resumeParLieu[cle] ?? 0) + 1;
+      }
+ 
+      return res.status(200).json({
+        message:           'Répartition effectuée avec succès',
+        concours:          concours.nom,
+        total_inscrits:    inscriptions.length,
+        total_affectes:    aAffecter.length,
+        debordements:      debordement.length,
+        force_affectes:    forceAffectes,
+        anciens_supprimes: suppression.count,
+        repartition_par_lieu: resumeParLieu,
+      });
+ 
+    } catch (err) {
+      console.error('[RepartitionController.repartirCandidats]', err);
+      return res.status(500).json({ error: 'Une erreur est survenue lors de la répartition' });
+    }
+  }
+ 
+
+static async consulterRepartition(req, res) {
+  const id_concours = parseInt(req.params.id_concours);
+
+  if (isNaN(id_concours)) {
+    return res.status(400).json({ error: 'id_concours invalide' });
+  }
+
+  try {
+    //  récupérer le concours (IMPORTANT)
+    const concours = await prisma.concours.findUnique({
+      where: { id_concours }
+    });
+
+    if (!concours) {
+      return res.status(404).json({ error: "Concours introuvable" });
+    }
+
+    const repartitions = await prisma.composer.findMany({
+      where: { id_concours },
+      select: {
+        id_composer: true,
+        candidat: {
+          select: {
+            nom: true,
+            prenom: true,
+            numero_cnib: true,
+            date_naissance: true,
+          },
+        },
+        lieux: {
+          select: {
+            nom: true,
+            quota: true,
+            centre: { select: { nom: true } },
+          },
+        },
+      },
+      orderBy: [
+        { id_lieux: 'asc' },
+        { candidat: { nom: 'asc' } },
+      ],
+    });
+
+    if (repartitions.length === 0) {
+      return res.status(404).json({
+        error: "Aucune répartition trouvée pour ce concours",
+      });
+    }
+
+    //  Grouper par lieu
+    const parLieu = {};
+
+    for (const r of repartitions) {
+      const cle = `${r.lieux.centre.nom} — ${r.lieux.nom}`;
+
+      if (!parLieu[cle]) {
+        parLieu[cle] = {
+          lieu: r.lieux.nom,
+          centre: r.lieux.centre.nom,
+          quota: r.lieux.quota,
+          candidats: [],
+        };
+      }
+
+      parLieu[cle].candidats.push({
+        nom: r.candidat.nom,
+        prenom: r.candidat.prenom,
+        numero_cnib: r.candidat.numero_cnib,
+        date_naissance: r.candidat.date_naissance,
+      });
+    }
+
+
+    return await GenererListCandidat({
+      concours: concours.nom,
+      annee: concours.annee,
+      lieux: Object.values(parLieu),
+    }, res);
+
+  } catch (err) {
+    console.error('[RepartitionController.consulterRepartition]', err);
+    return res.status(500).json({ error: 'Une erreur est survenue' });
+  }
+}
+
+
+  static async lieuDuCandidat(req, res) {
+    const id_concours = parseInt(req.params.id_concours);
+    const { id_candidat } = req.params;
+ 
+    if (isNaN(id_concours)) {
+      return res.status(400).json({ error: 'id_concours invalide' });
+    }
+ 
+    try {
+      const affectation = await prisma.composer.findUnique({
+        where: {
+          id_candidat_id_concours: { // nom de la contrainte @@unique
+            id_candidat,
+            id_concours,
+          },
+        },
+        select: {
+          candidat: {
+            select: {
+              nom:         true,
+              prenom:      true,
+              numero_cnib: true,
+              email:       true,
+              telephone:   true,
+            },
+          },
+          concours: {
+            select: { nom: true, date_debut: true },
+          },
+          lieux: {
+            select: {
+              nom:    true,
+              centre: { select: { nom: true } },
+            },
+          },
+        },
+      });
+ 
+      if (!affectation) {
+        return res.status(404).json({
+          error: 'Aucune affectation trouvée pour ce candidat dans ce concours',
+        });
+      }
+ 
+      
+      return res.status(200).json({
+        candidat:  `${affectation.candidat.prenom} ${affectation.candidat.nom}`,
+        cnib:      affectation.candidat.numero_cnib,
+        concours:  affectation.concours.nom,
+        date:      affectation.concours.date_debut,
+        centre:    affectation.lieux.centre.nom,
+        lieu:      affectation.lieux.nom,
+      });
+ 
+    } catch (err) {
+      console.error('[RepartitionController.lieuDuCandidat]', err);
+      return res.status(500).json({ error: 'Une erreur est survenue' });
+    }
+  }
+  static async createLieuCompo(req, res) {
+    try{
+      const{nom, id_centre,quota} = req.body;
+
+      const centre = await prisma.findUnique({where:{
+        id_centre
+      }});
+
+      if(!centre){
+        return res.status(404).json({error:'aucun centre trouver'})
+      }
+
+      await prisma.$transaction(async(tx)=>{
+       const lieux =  await tx.lieuxComposition.create({
+          data:{
+            nom:nom,
+            id_centre:id_centre,
+            quota:quota
+          }
+        })
+        return lieux;
+      });
+      return res.status(201).json({message:'un lieux de composition ajouter avec succes'})
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+// static async Composer(req,res){}
 
   static async Logout() {}
 }

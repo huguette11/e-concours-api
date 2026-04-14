@@ -22,9 +22,21 @@ static async Init(req, res) {
     ]);
 
     // Vérification des données
-    if (!concours || !candidat || !inscription) {
+    if(!candidat){
+       return res.status(404).json({
+        error: "les references du candidat sont incorrect veuillez réessayer",
+      });
+    }
+
+        if(!inscription){
+       return res.status(404).json({
+        error: "les references de l\'inscription sont incorrect veuillez réessayer",
+      });
+    }
+
+    if (!concours  ) {
       return res.status(404).json({
-        error: "Une erreur est survenue lors du paiement, veuillez réessayer",
+        error: "Aucun concours retrouver",
       });
     }
 

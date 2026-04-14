@@ -48,4 +48,21 @@ export class Cron {
       }
     });
   }
+
+  async backup (){
+    try{
+      const [candidat,concours,inscription ,admin,catec,centre ] = await Promise.all([
+        await prisma.candidat.findMany({}),
+         await prisma.concours.findMany({}),
+          await prisma.inscription.findMany({}),
+           await prisma.admin.findMany({}),
+            await prisma.categorieConcours.findMany({}),
+             await prisma.centre.findMany({}),
+      ]);
+
+    }
+    catch(err){
+      
+    }
+  }
 }

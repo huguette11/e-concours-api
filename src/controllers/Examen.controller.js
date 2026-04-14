@@ -3,7 +3,7 @@ import { prisma } from "../prisma.js";
 export class ExamenController {
 
 
-  async getExamensDuConcours(req, res) {
+  static async getExamensDuConcours(req, res) {
     try {
       const { id_concours } = req.params;
 
@@ -45,7 +45,7 @@ export class ExamenController {
   }
 
 
-  async getExamen(req, res) {
+  static async getExamen(req, res) {
     try {
       const id_candidat  = req.user.id;
       const { id_examen } = req.params;
@@ -108,7 +108,7 @@ export class ExamenController {
   }
 
 
-  async getMesResultats(req, res) {
+  static async getMesResultats(req, res) {
     try {
       const id_candidat = req.user.id;
 

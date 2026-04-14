@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 export class CandidatController {
 
  
- async getProfil(req, res) {
+ static async getProfil(req, res) {
     try {
       const id_candidat = req.user.id;
 
@@ -54,7 +54,7 @@ export class CandidatController {
     }
   }
 
-  async updateProfil(req, res) {
+ static  async updateProfil(req, res) {
     try {
       const id_candidat = req.user.id;
       const {
@@ -136,7 +136,7 @@ export class CandidatController {
   }
 
 
-  async getMesCandidatures(req, res) {
+  static async getMesCandidatures(req, res) {
     try {
       const id_candidat = req.user.id;
 
@@ -189,7 +189,7 @@ export class CandidatController {
   }
 
 
-  async getRecepisse(req, res) {
+  static async getRecepisse(req, res) {
     try {
       const id_candidat    = req.user.id;
       const id_inscription = parseInt(req.params.id_inscription);
@@ -245,7 +245,7 @@ export class CandidatController {
   }
 
   
-    async getResultats(req, res) {
+   static async getResultats(req, res) {
     try {
       const id_candidat = req.user.id;
 
@@ -302,4 +302,7 @@ export class CandidatController {
       return res.status(500).json({ error: "Erreur serveur" });
     }
   }
+
+
+  
 }

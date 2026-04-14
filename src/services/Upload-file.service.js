@@ -7,7 +7,7 @@ export const generateReceipt = async (data, res) => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
-  const doc = new PDFDocument({ size: "A4", margin: 0 });
+  const doc = new PDFDocument({ size: "A4", layout: "landscape", margin: 0 });
 
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", "inline; filename=recepisse.pdf");
@@ -15,161 +15,149 @@ export const generateReceipt = async (data, res) => {
 
   const pageWidth = doc.page.width;
   const pageHeight = doc.page.height;
-  const margin = 40;
-  const green = "#1a6e3c";
-  const lightGreen = "#e8f5ee";
-  const darkText = "#111111";
-  const grayText = "#666666";
-
-  // ─────────────────────────────────────────
-  // 1. BORDURE DÉCORATIVE
-  // ─────────────────────────────────────────
-  doc
-    .rect(15, 15, pageWidth - 30, pageHeight - 30)
-    .lineWidth(2.5)
-    .strokeColor(green)
-    .stroke();
+  const margin = 50;
+  const black = "#000000";
+  const gray = "#555555";
+  const lightGray = "#f4f4f4";
 
   doc
     .rect(20, 20, pageWidth - 40, pageHeight - 40)
-    .lineWidth(0.5)
-    .strokeColor(green)
+    .lineWidth(1)
+    .strokeColor(black)
     .stroke();
-
-  // ─────────────────────────────────────────
-  // 2. BANDEAU EN-TÊTE VERT
-  // ─────────────────────────────────────────
-  doc
-    .rect(15, 15, pageWidth - 30, 95)
-    .fill(green);
 
   try {
     const logoPath = path.join(__dirname, "..", "assets", "images", "armoiries.png");
-    doc.image(logoPath, 30, 22, { width: 75, height: 75 });
+    doc.image(logoPath, pageWidth / 2 - 30, 30, { width: 60, height: 60 });
   } catch (_) {}
 
   doc
-    .fillColor("#ffffff")
+    .fillColor(black)
     .fontSize(9)
-    .font("Helvetica")
-    .text("BURKINA FASO", 0, 28, { align: "center" })
-    .text("La Patrie ou la Mort nous Vaincrons", 0, 41, { align: "center" });
-
-  doc
-    .fontSize(12)
     .font("Helvetica-Bold")
-    .text("MINISTERE DES SERVITEURS DU PEUPLE", 0, 58, { align: "center" });
+    .text("BURKINA FASO", 0, 96, { align: "center" })
+    .fontSize(7.5)
+    .font("Helvetica")
+    .text("La Patrie ou la Mort nous Vaincrons", 0, 108, { align: "center" });
 
   doc
-    .fontSize(8)
-    .font("Helvetica")
-    .text("Direction Générale des Concours et Examens Professionnels", 0, 76, {
-      align: "center",
-    });
+    .fontSize(8.5)
+    .font("Helvetica-Bold")
+    .text("MINISTERE DES SERVITEURS DU PEUPLE", 0, 122, { align: "center" });
 
-  // ─────────────────────────────────────────
-  // 3. QR CODE
-  // ─────────────────────────────────────────
+  doc
+    .fontSize(7.5)
+    .font("Helvetica")
+    .text("Direction Générale des Concours et Examens Professionnels", 0, 134, { align: "center" });
+
+  doc
+    .moveTo(margin, 150)
+    .lineTo(pageWidth - margin, 150)
+    .lineWidth(0.8)
+    .strokeColor(black)
+    .stroke();
+
   const qr = await QRCode.toDataURL(JSON.stringify(data.qr), {
     margin: 1,
     color: { dark: "#000000", light: "#ffffff" },
   });
-  doc.image(qr, pageWidth - 110, 22, { width: 75, height: 75 });
-
-  // ─────────────────────────────────────────
-  // 4. TITRE PRINCIPAL
-  // ─────────────────────────────────────────
-  doc
-    .fillColor(green)
-    .fontSize(15)
-    .font("Helvetica-Bold")
-    .text("RÉCÉPISSÉ D'INSCRIPTION", 0, 128, { align: "center" });
+  doc.image(qr, pageWidth - margin - 70, 30, { width: 65, height: 65 });
 
   doc
-    .fillColor(grayText)
-    .fontSize(9.5)
+    .fillColor(gray)
+    .fontSize(6)
     .font("Helvetica")
-    .text("CONCOURS DIRECT DE LA FONCTION PUBLIQUE – SESSION 2026", 0, 148, {
-      align: "center",
-    });
+    .text("Scannez pour vérifier", pageWidth - margin - 70, 97, { width: 65, align: "center" });
 
   doc
-    .moveTo(margin + 10, 166)
-    .lineTo(pageWidth - margin - 10, 166)
-    .lineWidth(1.5)
-    .strokeColor(green)
-    .stroke();
-
-  // ─────────────────────────────────────────
-  // 5. BLOC CONCOURS / CENTRE
-  // ─────────────────────────────────────────
-  doc
-    .rect(margin, 176, pageWidth - margin * 2, 52)
-    .fill(lightGreen);
+    .fillColor(black)
+    .fontSize(14)
+    .font("Helvetica-Bold")
+    .text("RÉCÉPISSÉ D'INSCRIPTION", 0, 162, { align: "center" });
 
   doc
-    .rect(margin, 176, pageWidth - margin * 2, 52)
+    .fillColor(gray)
+    .fontSize(8.5)
+    .font("Helvetica")
+    .text("CONCOURS DIRECT DE LA FONCTION PUBLIQUE – SESSION 2026", 0, 180, { align: "center" });
+
+  doc
+    .moveTo(margin, 196)
+    .lineTo(pageWidth - margin, 196)
     .lineWidth(0.5)
-    .strokeColor(green)
+    .strokeColor(black)
     .stroke();
 
   const colW = (pageWidth - margin * 2) / 2;
-  const col1X = margin + 12;
-  const col2X = margin + colW + 12;
+  const col1X = margin;
+  const col2X = margin + colW;
 
   doc
-    .fillColor(grayText)
-    .fontSize(7.5)
-    .font("Helvetica")
-    .text("CONCOURS", col1X, 182);
+    .rect(margin, 204, pageWidth - margin * 2, 44)
+    .fill(lightGray);
 
   doc
-    .fillColor(darkText)
-    .fontSize(11)
-    .font("Helvetica-Bold")
-    .text(data.concours || "—", col1X, 194, { width: colW - 20 });
-
-  doc
-    .moveTo(margin + colW, 182)
-    .lineTo(margin + colW, 222)
+    .rect(margin, 204, pageWidth - margin * 2, 44)
     .lineWidth(0.5)
-    .strokeColor(green)
+    .strokeColor("#aaaaaa")
     .stroke();
 
   doc
-    .fillColor(grayText)
-    .fontSize(7.5)
-    .font("Helvetica")
-    .text("CENTRE D'EXAMEN", col2X, 182);
+    .moveTo(col2X, 204)
+    .lineTo(col2X, 248)
+    .lineWidth(0.5)
+    .strokeColor("#aaaaaa")
+    .stroke();
 
   doc
-    .fillColor(darkText)
-    .fontSize(11)
-    .font("Helvetica-Bold")
-    .text(data.centre || "—", col2X, 194, { width: colW - 20 });
+    .fillColor(gray)
+    .fontSize(7)
+    .font("Helvetica")
+    .text("CONCOURS", col1X + 10, 210);
 
-  // ─────────────────────────────────────────
-  // 6. SECTION IDENTITÉ
-  // ─────────────────────────────────────────
-  const sectionY1 = 240;
+  doc
+    .fillColor(black)
+    .fontSize(10)
+    .font("Helvetica-Bold")
+    .text(data.concours || "—", col1X + 10, 221, { width: colW - 20 });
+
+  doc
+    .fillColor(gray)
+    .fontSize(7)
+    .font("Helvetica")
+    .text("CENTRE D'EXAMEN", col2X + 10, 210);
+
+  doc
+    .fillColor(black)
+    .fontSize(10)
+    .font("Helvetica-Bold")
+    .text(data.centre || "—", col2X + 10, 221, { width: colW - 20 });
+
+  const sectionY1 = 260;
 
   doc
     .rect(margin, sectionY1, pageWidth - margin * 2, 18)
-    .fill(green);
+    .fill(lightGray);
 
   doc
-    .fillColor("#ffffff")
-    .fontSize(9)
+    .rect(margin, sectionY1, pageWidth - margin * 2, 18)
+    .lineWidth(0.5)
+    .strokeColor("#aaaaaa")
+    .stroke();
+
+  doc
+    .fillColor(black)
+    .fontSize(8.5)
     .font("Helvetica-Bold")
-    .text("IDENTITÉ DU CANDIDAT", margin + 10, sectionY1 + 5);
+    .text("IDENTITÉ DU CANDIDAT", margin + 8, sectionY1 + 5);
 
   doc
-    .fillColor("#ffffff")
-    .fontSize(9)
+    .fillColor(black)
+    .fontSize(8.5)
     .font("Helvetica-Bold")
     .text(`N° Dossier : ${data.numero_dossier || "N/A"}`, 0, sectionY1 + 5, {
       align: "right",
-      width: pageWidth - margin - 10,
+      width: pageWidth - margin - 8,
     });
 
   const fields = [
@@ -183,7 +171,7 @@ export const generateReceipt = async (data, res) => {
     ["Email", data.email || "—"],
   ];
 
-  const rowH = 30;
+  const rowH = 28;
   const fieldStartY = sectionY1 + 18;
 
   fields.forEach((field, i) => {
@@ -192,43 +180,77 @@ export const generateReceipt = async (data, res) => {
     const x = margin + col * colW;
     const y = fieldStartY + row * rowH;
 
-    doc
-      .rect(x, y, colW, rowH)
-      .fill(row % 2 === 0 ? "#f7faf8" : "#ffffff");
+    if (row % 2 === 0) {
+      doc.rect(x, y, colW, rowH).fill("#fafafa");
+    } else {
+      doc.rect(x, y, colW, rowH).fill("#ffffff");
+    }
 
     doc
       .rect(x, y, colW, rowH)
       .lineWidth(0.3)
-      .strokeColor("#bbddcc")
+      .strokeColor("#cccccc")
       .stroke();
 
     doc
-      .fillColor(grayText)
-      .fontSize(7)
+      .fillColor(gray)
+      .fontSize(6.5)
       .font("Helvetica")
-      .text(field[0].toUpperCase(), x + 8, y + 5);
+      .text(field[0].toUpperCase(), x + 8, y + 4);
 
     doc
-      .fillColor(darkText)
-      .fontSize(10)
+      .fillColor(black)
+      .fontSize(9.5)
       .font("Helvetica-Bold")
-      .text(field[1] || "—", x + 8, y + 15, { width: colW - 16 });
+      .text(field[1] || "—", x + 8, y + 13, { width: colW - 16 });
   });
 
-  // ─────────────────────────────────────────
-  // 7. SECTION CONSIGNES
-  // ─────────────────────────────────────────
-  const consigneY = fieldStartY + Math.ceil(fields.length / 2) * rowH + 18;
+  const afterFieldsY = fieldStartY + Math.ceil(fields.length / 2) * rowH;
+  const dateY = afterFieldsY + 16;
+
+  doc
+    .rect(margin, dateY, pageWidth - margin * 2, 28)
+    .fill(lightGray);
+
+  doc
+    .rect(margin, dateY, pageWidth - margin * 2, 28)
+    .lineWidth(0.5)
+    .strokeColor("#aaaaaa")
+    .stroke();
+
+  doc
+    .fillColor(gray)
+    .fontSize(7)
+    .font("Helvetica")
+    .text("DATE D'INSCRIPTION", margin + 10, dateY + 4);
+
+  doc
+    .fillColor(black)
+    .fontSize(10)
+    .font("Helvetica-Bold")
+    .text(
+      data.date_inscription || new Date().toLocaleDateString("fr-FR"),
+      margin + 10,
+      dateY + 14
+    );
+
+  const consigneY = dateY + 44;
 
   doc
     .rect(margin, consigneY, pageWidth - margin * 2, 18)
-    .fill(green);
+    .fill(lightGray);
 
   doc
-    .fillColor("#ffffff")
-    .fontSize(9)
+    .rect(margin, consigneY, pageWidth - margin * 2, 18)
+    .lineWidth(0.5)
+    .strokeColor("#aaaaaa")
+    .stroke();
+
+  doc
+    .fillColor(black)
+    .fontSize(8.5)
     .font("Helvetica-Bold")
-    .text("CONSIGNES IMPORTANTES", margin + 10, consigneY + 5);
+    .text("CONSIGNES IMPORTANTES", margin + 8, consigneY + 5);
 
   const consignes = [
     "Toute détention de téléphone portable ou appareil électronique dans la salle est strictement interdite.",
@@ -240,140 +262,282 @@ export const generateReceipt = async (data, res) => {
   let cy = consigneY + 24;
   consignes.forEach((c, i) => {
     doc
-      .fillColor(darkText)
-      .fontSize(8)
+      .fillColor(black)
+      .fontSize(7.5)
       .font("Helvetica")
       .text(`${i + 1}.  ${c}`, margin + 10, cy, {
         width: pageWidth - margin * 2 - 20,
       });
-    cy += 18;
+    cy += 16;
   });
 
-  // ─────────────────────────────────────────
-  // 8. MINI TABLEAU DATE INSCRIPTION / CENTRE
-  // ─────────────────────────────────────────
-  const sigY = cy + 20;
-  const tableW = pageWidth - margin * 2;
-  const cellW = tableW / 2;
-  const cellH = 48;
-
-  // En-têtes du tableau
-  doc
-    .rect(margin, sigY, cellW, 18)
-    .fill(green);
+  const footerY = pageHeight - 55;
 
   doc
-    .rect(margin + cellW, sigY, cellW, 18)
-    .fill(green);
-
-  doc
-    .fillColor("#ffffff")
-    .fontSize(8)
-    .font("Helvetica-Bold")
-    .text("DATE D'INSCRIPTION", margin + 10, sigY + 5);
-
-  doc
-    .fillColor("#ffffff")
-    .fontSize(8)
-    .font("Helvetica-Bold")
-    .text("CENTRE D'EXAMEN", margin + cellW + 10, sigY + 5);
-
-  // Valeurs du tableau
-  doc
-    .rect(margin, sigY + 18, cellW, cellH)
-    .fill(lightGreen);
-
-  doc
-    .rect(margin + cellW, sigY + 18, cellW, cellH)
-    .fill("#ffffff");
-
-  // Bordures cellules valeurs
-  doc
-    .rect(margin, sigY + 18, cellW, cellH)
+    .moveTo(margin, footerY)
+    .lineTo(pageWidth - margin, footerY)
     .lineWidth(0.5)
-    .strokeColor(green)
+    .strokeColor(black)
     .stroke();
 
   doc
-    .rect(margin + cellW, sigY + 18, cellW, cellH)
-    .lineWidth(0.5)
-    .strokeColor(green)
-    .stroke();
-
-  // Bordure globale tableau
-  doc
-    .rect(margin, sigY, tableW, 18 + cellH)
-    .lineWidth(0.8)
-    .strokeColor(green)
-    .stroke();
-
-  doc
-    .fillColor(darkText)
-    .fontSize(12)
+    .fillColor(black)
+    .fontSize(7.5)
     .font("Helvetica-Bold")
-    .text(
-      data.date_inscription || new Date().toLocaleDateString("fr-FR"),
-      margin + 10,
-      sigY + 30
-    );
+    .text("e-Concours Burkina Faso", 0, footerY + 8, { align: "center" });
 
   doc
-    .fillColor(darkText)
-    .fontSize(11)
-    .font("Helvetica-Bold")
-    .text(data.centre || "—", margin + cellW + 10, sigY + 30, {
-      width: cellW - 20,
-    });
-
-  // ─────────────────────────────────────────
-  // 9. PIED DE PAGE
-  // ─────────────────────────────────────────
-  const footerY = pageHeight - 70;
-
-  doc
-    .moveTo(margin + 10, footerY)
-    .lineTo(pageWidth - margin - 10, footerY)
-    .lineWidth(0.8)
-    .strokeColor(green)
-    .stroke();
-
-  doc
-    .fillColor(green)
-    .fontSize(8)
-    .font("Helvetica-Bold")
-    .text("e-Concours Burkina Faso", 0, footerY + 7, { align: "center" });
-
-  doc
-    .fillColor(grayText)
-    .fontSize(7)
+    .fillColor(gray)
+    .fontSize(6.5)
     .font("Helvetica")
     .text(
       `Document généré le ${new Date().toLocaleDateString("fr-FR")} à ${new Date().toLocaleTimeString("fr-FR")}  –  Ce document est officiel et infalsifiable.`,
       margin,
-      footerY + 19,
-      { align: "center", width: pageWidth - margin * 2 }
-    );
-
-  doc
-    .fillColor("#aaaaaa")
-    .fontSize(6.5)
-    .text(
-      "Scannez le QR code pour vérifier l'authenticité de ce document.",
-      margin,
-      footerY + 30,
+      footerY + 20,
       { align: "center", width: pageWidth - margin * 2 }
     );
 
   doc.end();
 };
 
-// generer la listes des candidats 
 
-export const GenererListCandidat = async(data,rest) =>{
+// GEN DE LA LISTE OFFICIELLE DES CANDIDATS PAR LIEU DE COMPOSITION
+//
+// data = {
+//   concours   : string         — nom du concours
+//   annee      : number         — année session
+//   lieux      : Array<{
+//     lieu     : string,        — nom du lieu
+//     centre   : string,        — nom du centre
+//     quota    : number,
+//     candidats: Array<{
+//       nom            : string,
+//       prenom         : string,
+//       numero_cnib    : string,
+//       date_naissance : string | Date,
+//     }>
+//   }>
+// }
 
+export const GenererListCandidat = async (data, res) => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname  = path.dirname(__filename);
+
+  const PAGE_W = 595.28;
+  const PAGE_H = 841.89;
+  const MARGIN = 40;
+  const CONTENT_W = PAGE_W - MARGIN * 2;
+
+  const BLACK = "#000000";
+  const WHITE = "#ffffff";
+  const GRAY  = "#666666";
+  const LIGHT = "#f2f2f2";
+  const BORDER = "#999999";
+
+  const ROW_H = 18;
+
+  const COLS = [
+    { label: "N°", x: MARGIN, w: 30 },
+    { label: "NOM", x: MARGIN + 30, w: 120 },
+    { label: "PRÉNOM", x: MARGIN + 150, w: 120 },
+    { label: "CNIB", x: MARGIN + 270, w: 110 },
+    { label: "NAISSANCE", x: MARGIN + 380, w: 90 },
+    { label: "SIGNATURE", x: MARGIN + 470, w: CONTENT_W - 470 },
+  ];
+
+  const fmtDate = (d) =>
+    !d ? "—" : new Date(d).toLocaleDateString("fr-BF");
+
+  const doc = new PDFDocument({
+    size: "A4",
+    margin: 0,
+    bufferPages: true,
+  });
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", "inline; filename=liste.pdf");
+  doc.pipe(res);
+
+  const drawHeader = (page) => {
+    doc.rect(0, 0, PAGE_W, 80).fill(BLACK);
+
+    doc.fillColor(WHITE)
+      .font("Helvetica-Bold")
+      .fontSize(10)
+      .text("BURKINA FASO", 0, 10, { align: "center" });
+
+    doc.fontSize(8)
+      .font("Helvetica")
+      .text("Unité - Progrès - Justice", 0, 25, { align: "center" });
+
+    doc.fontSize(12)
+      .font("Helvetica-Bold")
+      .text(
+        (data.concours || "LISTE DES CANDIDATS").toUpperCase(),
+        0,
+        40,
+        { align: "center" }
+      );
+
+    doc.fontSize(8)
+      .text(
+        `Session ${data.annee || new Date().getFullYear()}`,
+        0,
+        58,
+        { align: "center" }
+      );
+
+    doc.fontSize(7)
+      .text(`Page ${page}`, PAGE_W - MARGIN - 60, 60);
+  };
+
+  
+  const drawFooter = () => {
+    doc
+      .strokeColor(BORDER)
+      .moveTo(MARGIN, PAGE_H - 30)
+      .lineTo(PAGE_W - MARGIN, PAGE_H - 30)
+      .stroke();
+
+    doc.fillColor(GRAY)
+      .fontSize(7)
+      .text(
+        "Document généré automatiquement - e-Concours Burkina Faso",
+        MARGIN,
+        PAGE_H - 25,
+        { align: "center", width: CONTENT_W }
+      );
+  };
+
+
+  const drawTableHeader = (y) => {
+    doc.rect(MARGIN, y, CONTENT_W, 16).fill(BLACK);
+
+    COLS.forEach(c => {
+      doc.fillColor(WHITE)
+        .fontSize(7)
+        .font("Helvetica-Bold")
+        .text(c.label, c.x + 3, y + 5);
+    });
+
+    return y + 16;
+  };
+
+
+  const drawRow = (c, i, y) => {
+    const bg = i % 2 === 0 ? WHITE : LIGHT;
+
+    doc.rect(MARGIN, y, CONTENT_W, ROW_H).fill(bg);
+
+    doc.strokeColor(BORDER)
+      .moveTo(MARGIN, y + ROW_H)
+      .lineTo(MARGIN + CONTENT_W, y + ROW_H)
+      .stroke();
+
+    const vals = [
+      String(i + 1).padStart(3, "0"),
+      (c.nom || "—").toUpperCase(),
+      c.prenom || "—",
+      c.numero_cnib || "—",
+      fmtDate(c.date_naissance),
+      ""
+    ];
+
+    vals.forEach((v, idx) => {
+      doc.fillColor(BLACK)
+        .fontSize(7.5)
+        .font(idx === 1 ? "Helvetica-Bold" : "Helvetica")
+        .text(v, COLS[idx].x + 3, y + 5, {
+          width: COLS[idx].w - 6,
+          ellipsis: true
+        });
+    });
+
+    return y + ROW_H;
+  };
+
+
+  let page = 1;
+
+  drawHeader(page);
+  drawFooter();
+
+  let y = 100;
+
+  for (const lieuData of data.lieux || []) {
+    const { centre, lieu, quota = 0, candidats = [] } = lieuData;
+
+    doc.fillColor(BLACK)
+      .font("Helvetica-Bold")
+      .fontSize(10)
+      .text(`${centre} - ${lieu}`, MARGIN, y);
+
+    y += 12;
+
+    doc.fillColor(GRAY)
+      .font("Helvetica")
+      .fontSize(8)
+      .text(
+        `Quota: ${quota} | Affectés: ${candidats.length} | Taux: ${quota ? Math.round((candidats.length / quota) * 100) : 0}%`,
+        MARGIN,
+        y
+      );
+
+    y += 14;
+
+    y = drawTableHeader(y);
+
+    for (let i = 0; i < candidats.length; i++) {
+      if (y > PAGE_H - 60) {
+        doc.addPage();
+        page++;
+
+        drawHeader(page);
+        drawFooter();
+        y = 100;
+        y = drawTableHeader(y);
+      }
+
+      y = drawRow(candidats[i], i, y);
+    }
+
+    y += 10;
+
+    doc.fillColor(GRAY)
+      .fontSize(8)
+      .text(
+        `Sous-total : ${candidats.length} candidat(s)`,
+        MARGIN,
+        y
+      );
+
+    y += 20;
+  }
+
+  doc.addPage();
+  page++;
+
+  drawHeader(page);
+  drawFooter();
+
+  doc.fillColor(BLACK)
+    .font("Helvetica-Bold")
+    .fontSize(12)
+    .text("RÉCAPITULATIF GÉNÉRAL", MARGIN, 120, { align: "center", width: CONTENT_W });
+
+  doc.fillColor(GRAY)
+    .fontSize(9)
+    .text(
+      `Total candidats : ${(data.lieux || []).reduce((a,l)=>a+(l.candidats?.length||0),0)}`,
+      MARGIN,
+      160,
+      { align: "center", width: CONTENT_W }
+    );
+
+  doc.end();
 };
 
 
-export const UploadFile = async ()=>{
-
-};
+export const GenererListConcours = async (data,res)=>{
+  
+}
