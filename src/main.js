@@ -6,6 +6,8 @@ import cors from "cors";
 import { swaggerDocs } from "./swagger.js";
 import helmet from "helmet";
 import inscriptionRoutes from "./routes/inscription.route.js";
+import concoursRoutes    from "./routes/concours.route.js";
+
 
 
 
@@ -41,6 +43,7 @@ app.use("/inscriptions", inscriptionRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/candidats", candidatRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api/concours",     concoursRoutes);
 
 swaggerDocs(app, PORT);
 

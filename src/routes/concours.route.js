@@ -3,11 +3,17 @@ import { ConcoursController } from "../controllers/Concours.controller.js";
 import { AuthMiddleware }     from "../middleware/AuthMiddleware.js";
 
 const router = Router();
-const ctrl   = new ConcoursController();
 
 router.use(AuthMiddleware.protect);
 
-router.get("/",    (req, res) => ctrl.getAllConcours(req, res));
-router.get("/:id", (req, res) => ctrl.getConcours(req, res));
+
+// Liste de tous les concours
+router.get("/",                        (req, res) => ConcoursController.GetAllConcours(req, res));
+
+// Détail d'un concours
+router.get("/detail/:id_concours",     (req, res) => ConcoursController.DetailConcours(req, res));
+
+// Liste des catégories
+router.get("/categories",              (req, res) => ConcoursController.GetCategorie(req, res));
 
 export default router;

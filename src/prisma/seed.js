@@ -86,9 +86,9 @@ async function main() {
       description: "Recrutement d'instituteurs pour les écoles primaires publiques.",
       frais_inscription: 3000,
       nombre_postes: 500,
-      annee: 2025,
-      date_debut: new Date("2025-05-01"),
-      date_fin: new Date("2025-06-30"),
+      annee: 2026,
+      date_debut: new Date("2026-05-01"),
+      date_fin: new Date("2026-06-30"),
       statut_concours: "OUVERT",
       categorieId: categories[3].id,
       centreIds: [centres[0].id_centre, centres[1].id_centre],
@@ -119,20 +119,23 @@ async function main() {
     where: { email: "johndoe@example.com" },
   });
 
-  if (!candidat) {
-    candidat = await prisma.candidat.create({
-      data: {
-        nom: "Doe",
-        prenom: "John",
-        sexe: "HOMME",
-        date_naissance: new Date("1990-01-01"),
-        numero_cnib: "B123456789",
-        email: "johndoe@example.com",
-        mot_de_passe: await bcrypt.hash("Password@123", 10),
-      },
-    });
-  }
-
+if (!candidat) {
+  candidat = await prisma.candidat.create({
+    data: {
+      nom: "Doe",
+      prenom: "John",
+      sexe: "HOMME",
+      date_naissance:  new Date("1990-01-01"),
+      lieu_naissance:  "Ouagadougou",
+      pays_naissance:  "Burkina Faso",
+      numero_cnib:     "B123456789",
+      date_delivrance: new Date("2015-06-15"),
+      telephone:       "+22670000000",
+      email:           "johndoe@example.com",
+      mot_de_passe:    await bcrypt.hash("Password@123", 10),
+    },
+  });
+}
   // --- INSCRIPTION DU CANDIDAT DANS TOUS LES CONCOURS OUVERTS ---
   for (const concours of concoursList) {
     const exists = await prisma.inscription.findFirst({
@@ -146,7 +149,7 @@ async function main() {
         data: {
           id_candidat: candidat.id_candidat,
           id_concours: concours.id_concours,
-          statut_inscription: "en_attente",
+          statut_inscription: "EN_ATTENTE",
           paiement: {
             create: {
               montant: concours.frais_inscription,

@@ -4,14 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node main.js",
     "dev": "nodemon main.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio",
-    "prisma:reset": "prisma migrate reset"
+    "prisma:generate": "./node_modules/.bin/prisma generate",
+    "prisma:migrate": "./node_modules/.bin/prisma migrate dev",
+    "prisma:deploy": "./node_modules/.bin/prisma migrate deploy",
+    "prisma:studio": "./node_modules/.bin/prisma studio",
+    "prisma:reset": "./node_modules/.bin/prisma migrate reset"
   },
   "keywords": [],
   "author": "",
@@ -42,7 +41,8 @@
     "nodemon": "^3.1.14",
     "prisma": "^5.22.0"
   },
- "prisma": {
-  "seed": "node prisma/seed.js"
-}
+  "prisma": {
+    "seed": "node prisma/seed.js",
+    "schema": "prisma/schema.prisma"
+  }
 }
