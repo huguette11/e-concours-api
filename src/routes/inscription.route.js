@@ -3,11 +3,13 @@ import { InscriptionController } from "../controllers/inscription.controller.js"
 import { AuthMiddleware } from "../middleware/AuthMiddleware.js";
 
 const router = express.Router();
-const controller = new InscriptionController();
 
+router.use(AuthMiddleware.protect);
+router.use(AuthMiddleware.CompteVerifier);
 
-router.post("/", AuthMiddleware.protect, controller.sInscrire);
-
-router.get("/:id_inscription", AuthMiddleware.protect, controller.getInscription);
+router.post("/s-inscrire",InscriptionController.sInscrire);
+// router.get("/:id_inscription",InscriptionController.getInscription);
+router.post("/get-recepisser",InscriptionController.GetRecippiser);
+router.get('/mes-inscriptions',InscriptionController.MesInscriptions);
 
 export default router;

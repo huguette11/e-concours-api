@@ -1,10 +1,10 @@
-import { Router }            from "express";
+import { Router } from "express";
 import { ConcoursController } from "../controllers/Concours.controller.js";
-import { AuthMiddleware }     from "../middleware/AuthMiddleware.js";
+import { AuthMiddleware } from "../middleware/AuthMiddleware.js";
+import { AdminController } from "../controllers/Admin.controller.js";
 
 const router = Router();
 
-router.use(AuthMiddleware.protect);
 
 
 // Liste de tous les concours

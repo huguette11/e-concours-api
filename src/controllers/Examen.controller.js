@@ -2,8 +2,24 @@ import { prisma } from "../prisma.js";
 
 export class ExamenController {
 
+
+   static async getByConcours(req, res) {
+    try {
+      const { id_concours } = req.params;
+
+      const examens = await prisma.examen.findMany({
+        where: { id_concours: parseInt(id_concours) }
+      });
+
+      return res.status(200).json(examens);
+
+    } catch (err) {
+      return res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
   // ─── GET /api/examens/concours/:id_concours ───────────────
-  async getExamensDuConcours(req, res) {
+  static async getExamensDuConcours(req, res) {
     try {
       // parseInt car id_concours est un Int dans le schéma
       const id_concours = parseInt(req.params.id_concours);

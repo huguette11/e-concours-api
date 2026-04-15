@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { sendMail } from '../config/mailer.js';
 import { error } from 'console';
+import { OrangeApi } from '../api/Orange.api.js';
 export class NotificationService {
 
   constructor(email = null, telephone = null) {
@@ -30,7 +31,12 @@ async envoyerOtpEmail(otp) {
 }
 
 async envoyerOtpTelephone (otp) {
-  if(!this.telephone) throw new Error('numero de telephone non definis')
+  if(!this.telephone) throw new Error('numero de telephone non definis');
+
+  const ApiConnect = new OrangeApi(this.telephone);
+  const rep = await  ApiConnect.SendOtp({otp});
+
+  console.log(rep);
 }
   
 

@@ -83,21 +83,22 @@ export class CandidatDto {
     ];
   }
 
-  static ValidateLogin() {
-    return [
-      body("email")
-        .notEmpty()
-        .withMessage("L'email est requis")
-        .isEmail()
-        .withMessage("Le champ doit être un email valide"),
+static ValidateLogin() {
+  return [
+    body("telephone")
+      .notEmpty()
+      .withMessage("Le téléphone est requis")
+      .withMessage("Numéro de téléphone invalide")
+      .isLength({ min: 8, max: 11})
+      .withMessage("Le numéro doit contenir exactement 8 chiffres"),
 
-      body("mot_de_passe")
-        .notEmpty()
-        .withMessage("Le mot de passe est requis")
-        .isLength({ min: 8 })
-        .withMessage("Le mot de passe doit contenir au moins 8 caractères"),
-    ];
-  }
+    body("mot_de_passe")
+      .notEmpty()
+      .withMessage("Le mot de passe est requis")
+      .isLength({ min: 8 })
+      .withMessage("Le mot de passe doit contenir au moins 8 caractères"),
+  ];
+}
 
   static ValidateContactUs() {
     return [

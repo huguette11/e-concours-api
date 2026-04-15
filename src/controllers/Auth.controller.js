@@ -4,6 +4,7 @@ import { response } from "express";
 import jwt from "jsonwebtoken";
 import { contactTemplate } from "../services/templates/Mail/contactUs.js";
 import { sendMailContact } from "../config/mailer.js";
+import { connection } from "../config/redis.js";
 export class AuthController {
   constructor(notificationService) {
     this.notificationService = notificationService;
@@ -14,27 +15,45 @@ export class AuthController {
     this.ForgotPassword = this.ForgotPassword.bind(this);
     this.Logout = this.Logout.bind(this);
     this.ResendOtp = this.ResendOtp.bind(this);
+    this.VerifieNumber = this.VerifieNumber.bind(this);
+  }
+
+  async VerifieNumber(req, res) {
+    try {
+      const { tel } = req.body;
+      const cachekey = `verif-${tel}`;
+      this.notificationService.telephone = tel;
+      const otp = this.notificationService.genererOtp();
+      await connection.set(cachekey, JSON.stringify(cachekey));
+      await this.notificationService.envoyerOtpEmail(otp);
+    } catch (err) {
+      console.log("erreur", err);
+    }
   }
 
   async Login(req, res) {
     try {
-      const { email, mot_de_passe } = req.body;
+      const { telephone, mot_de_passe } = req.body;
 
-      if (!email || !mot_de_passe) {
-        return res.status(400).json({ error: "Email et mot de passe requis" });
+      if (!telephone || !mot_de_passe) {
+        return res
+          .status(400)
+          .json({ error: "telephone et mot de passe requis" });
       }
 
-      const candidat = await prisma.candidat.findUnique({ where: { email } });
+      const candidat = await prisma.candidat.findUnique({
+        where: { telephone:telephone },
+      });
 
       if (!candidat) {
         return res.status(404).json({ error: "Candidat non trouvé" });
       }
 
-      if (candidat.statut_compte !== "ACTIF") {
-        return res
-          .status(401)
-          .json({ error: "Veuillez vérifier votre compte pour continuer" });
-      }
+      // if (candidat.statut_compte !== "ACTIF") {
+      //   return res
+      //     .status(401)
+      //     .json({ error: "Veuillez vérifier votre compte pour continuer" });
+      // }
 
       const motDePasseCorrect = await bcrypt.compare(
         mot_de_passe,
@@ -115,7 +134,7 @@ export class AuthController {
             mot_de_passe: motDePasseHashe,
             statut_compte: "INACTIF",
             otp,
-            otp_expire_at,
+            otp_expiration: otp_expire_at,
           },
         });
 
@@ -142,6 +161,7 @@ export class AuthController {
           await this.notificationService.envoyerOtpTelephone(otp);
           break;
         case "mail":
+          await this.notificationService.envoyerOtpEmail(otp);
         default:
           await this.notificationService.envoyerOtpEmail(otp);
           break;
@@ -149,7 +169,7 @@ export class AuthController {
 
       const refreshToken = jwt.sign(
         {
-          id: candidat.id,
+          id: candidat.id_candidat,
           email: candidat.email,
         },
         process.env.JWT_SECRET,
@@ -175,16 +195,18 @@ export class AuthController {
     try {
       const { otp } = req.body;
 
-      const email = req.user.email;
+      const { id_candidat } = req.user;
 
-      const candidat = await prisma.candidat.findUnique({ where: { email } });
+      const candidat = await prisma.candidat.findUnique({
+        where: { id_candidat },
+      });
 
       if (!candidat) {
         return res.status(404).json({ error: "Adresse mail introuvable" });
       }
 
-      if (!candidat.otp_expire_at || new Date() > candidat.otp_expire_at) {
-        return res.status(400).json({ error: "OTP expiré" });
+      if (!candidat.otp_expiration || new Date() > candidat.otp_expiration) {
+        return res.status(400).json({ error: "OTP expire" });
       }
 
       if (candidat.otp !== otp) {
@@ -192,34 +214,57 @@ export class AuthController {
       }
 
       await prisma.candidat.update({
-        where: { email },
-        data: { statut_compte: "ACTIF", otp: null, otp_expire_at: null },
+        where: { id_candidat },
+        data: { statut_compte: "ACTIF", otp: null, otp_expiration: null },
       });
 
-      res
+      return res
         .status(200)
         .json({ message: "Vérification réussie, vous pouvez vous connecter" });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Erreur serveur" });
+      return res.status(500).json({ error: "Erreur serveur" });
     }
   }
 
-  async ResendOtp() {
+  async ResendOtp(req, res) {
     try {
-      const candidat = req.user.id;
+      const { email } = req.body;
+
+      const candidat = await prisma.candidat.findUnique({ where: { email } });
       if (!candidat) {
         return res.status(404).json({ error: "candidat non trouver" });
       }
       this.notificationService.email = candidat.email;
       this.notificationService.telephone = candidat.telephone;
       const otp = this.notificationService.genererOtp();
-      if (await this.notificationService.envoyerOtpTelephone(otp)) {
-        return res
-          .status(200)
-          .json({ message: "code de verification envoyer avec succes" });
-      }
+      await this.notificationService.envoyerOtpEmail(otp);
+
+      // const otp = this.notificationService.genererOtp();
+      const otp_expire_at = new Date(Date.now() + 10 * 60 * 1000);
+
+      await prisma.candidat.update({
+        where: { email },
+        data: {
+          otp: otp,
+          otp_expiration: otp_expire_at,
+        },
+      });
+      const refreshToken = jwt.sign(
+        {
+          id: candidat.id_candidat,
+          email: candidat.email,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" },
+      );
+
+      return res.status(200).json({
+        message: "code de verification envoyer avec succes",
+        token: refreshToken,
+      });
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: "une erreur est survenue" });
     }
   }
@@ -252,7 +297,7 @@ export class AuthController {
 
       await prisma.candidat.update({
         where: { id_candidat: candidat.id_candidat },
-        data: { otp, otp_expire_at },
+        data: { otp, otp_expiration: otp_expire_at },
       });
 
       this.notificationService.email = candidat.email;
@@ -280,22 +325,21 @@ export class AuthController {
   // mots de passe oublier .. methode pour recuperer le mots de passe (changer le password)
 
   async ResetPassword(req, res) {
-    const { mot_de_passe, otp, telephone, email, choix } = req.body();
+    const { mot_de_passe, otp } = req.body();
+    const { id_candidat } = req.user;
+    const candidat = await prisma.candidat.findUnique({
+      where: { id_candidat },
+    });
 
-    let candidat;
-
-    if (choix === "sms") {
-      candidat = await prisma.candidat.findFirst({ where: { telephone } });
-    } else {
-      candidat = await prisma.candidat.findUnique({ where: { email } });
-    }
+    // if (choix === "sms") {
+    //   candidat = await prisma.candidat.findFirst({ where: { telephone } });
+    // } else {
+    //   candidat = await prisma.candidat.findUnique({ where: { email } });
+    // }
 
     if (!candidat) {
       return res.status(404).json({
-        error:
-          choix === "sms"
-            ? "Aucun compte associé à ce numéro"
-            : "Aucun compte associé à cet email",
+        error: "Aucun compte  trouve",
       });
     }
 
@@ -308,8 +352,9 @@ export class AuthController {
       const updatedC = await tx.candidat.update({
         where: { id: candidat.id_candidat },
         data: {
-          mot_de_passe: mdpHash,
+          mot_de_passe: mdphash,
           otp: null,
+          otp_expiration: null,
         },
       });
       return updatedC;

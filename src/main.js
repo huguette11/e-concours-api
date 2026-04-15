@@ -1,19 +1,21 @@
-import express from "express";
+ import express from "express";
 import candidatRoutes from "./routes/candidat.route.js";
 import authRoutes from "./routes/auth.route.js";
 import adminRoutes from "./routes/admin.route.js"; 
 import cors from "cors";
 import { swaggerDocs } from "./swagger.js";
 import helmet from "helmet";
+import { connection } from "./config/redis.js";
 import inscriptionRoutes from "./routes/inscription.route.js";
-import concoursRoutes    from "./routes/concours.route.js";
-
-
-
+import paiementRoutes from "./routes/paiement.route.js";
+import concoursRoutes from "./routes/concours.route.js";
+import { limiter } from "./middleware/rateLimiter.js";
+import { Cron } from "./cron/Cron.js";
+import examenRoutes from "./routes/admin.examen.routes.js";
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const allowedOrigins = [
   "http://localhost:3000",   
@@ -38,12 +40,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
+app.use(limiter)
 
-app.use("/inscriptions", inscriptionRoutes);
+app.use("/api/inscription", inscriptionRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/candidats", candidatRoutes);
-app.use("/admin", adminRoutes);
-app.use("/api/concours",     concoursRoutes);
+app.use("/api/candidats", candidatRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/payment",paiementRoutes)
+app.use("/api/concours",concoursRoutes)
+app.use("/api/admin", examenRoutes);
 
 swaggerDocs(app, PORT);
 
@@ -51,6 +56,11 @@ app.get("/", (req, res) => {
   res.send("API e-concours opérationnelle");
 });
 
+// await connection.set("test", "ioredis fonctionne !");
+// const val = await connection.get("test");
+// console.log(val); // ioredis fonctionne !
+
 app.listen(PORT, () => {
+
   console.log(`Server is running on port ${PORT}`);
 });
