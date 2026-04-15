@@ -134,8 +134,11 @@ async function main() {
       nom: "Concours Enseignants du Primaire 2025",
       type: "DIRECT",
       description: "Recrutement d'instituteurs pour les écoles primaires publiques.",
-      frais_inscription: 3000, nombre_postes: 500, annee: 2025,
-      date_debut: new Date("2025-05-01"), date_fin: new Date("2025-06-30"),
+      frais_inscription: 3000,
+      nombre_postes: 500,
+      annee: 2026,
+      date_debut: new Date("2026-05-01"),
+      date_fin: new Date("2026-06-30"),
       statut_concours: "OUVERT",
       categorieId: categories[3].id,
       centreIds: centres.map(c => c.id_centre),
@@ -168,58 +171,44 @@ async function main() {
   const TOTAL             = 10_000;
   const LOT               = 500;
 
-  console.log(`\n⏳ Génération de ${TOTAL} candidats par lots de ${LOT}...`);
-
-  // Vérifier combien existent déjà
-  const existants = await prisma.candidat.count();
-  if (existants >= TOTAL) {
-    console.log(`⚠️  ${existants} candidats déjà présents, étape ignorée.`);
-  } else {
-    let total_crees = existants;
-    let lot_num     = 0;
-    const cnibSet   = new Set(); // éviter les doublons CNIB dans la session
-    const emailSet  = new Set();
-    const telSet    = new Set();
-
-    while (total_crees < TOTAL) {
-      const taille   = Math.min(LOT, TOTAL - total_crees);
-      const candidats = [];
-
-      for (let i = 0; i < taille; i++) {
-        const sexe    = Math.random() > 0.45 ? "HOMME" : "FEMME";
-        const prenom  = sexe === "HOMME" ? rand(PRENOMS_H) : rand(PRENOMS_F);
-        const nom     = rand(NOMS);
-        const index   = total_crees + i + 1;
-
-        // Identifiants uniques garantis
-        let cnib, email, tel;
-        do { cnib = `B${String(randInt(100000000, 999999999))}`; } while (cnibSet.has(cnib));
-        do { email = `candidat${index}.${Math.random().toString(36).slice(2,6)}@econcours.bf`; } while (emailSet.has(email));
-        do { tel = `${rand(['70','71','72','73','74','75','76','77','78'])}${String(randInt(100000, 999999))}`; } while (telSet.has(tel));
-
-        cnibSet.add(cnib);
-        emailSet.add(email);
-        telSet.add(tel);
-
-        candidats.push({
-          nom,
-          prenom,
-          sexe,
-          date_naissance:  genererDate(1985, 2000),
-          lieu_naissance:  rand(LIEUX_NAISSANCE),
-          pays_naissance:  "Burkina Faso",
-          numero_cnib:     cnib,
-          date_delivrance: genererDate(2015, 2023),
-          telephone:       tel,
-          email,
-          mot_de_passe:    MOT_DE_PASSE_HASH,
-          statut_compte:   "ACTIF",
-        });
-      }
-
-      await prisma.candidat.createMany({
-        data: candidats,
-        skipDuplicates: true,
+if (!candidat) {
+  candidat = await prisma.candidat.create({
+    data: {
+      nom: "Doe",
+      prenom: "John",
+      sexe: "HOMME",
+      date_naissance:  new Date("1990-01-01"),
+      lieu_naissance:  "Ouagadougou",
+      pays_naissance:  "Burkina Faso",
+      numero_cnib:     "B123456789",
+      date_delivrance: new Date("2015-06-15"),
+      telephone:       "+22670000000",
+      email:           "johndoe@example.com",
+      mot_de_passe:    await bcrypt.hash("Password@123", 10),
+    },
+  });
+}
+  // --- INSCRIPTION DU CANDIDAT DANS TOUS LES CONCOURS OUVERTS ---
+  for (const concours of concoursList) {
+    const exists = await prisma.inscription.findFirst({
+      where: {
+        id_candidat: candidat.id_candidat,
+        id_concours: concours.id_concours,
+      },
+    });
+    if (!exists) {
+      await prisma.inscription.create({
+        data: {
+          id_candidat: candidat.id_candidat,
+          id_concours: concours.id_concours,
+          statut_inscription: "EN_ATTENTE",
+          paiement: {
+            create: {
+              montant: concours.frais_inscription,
+              statut_paiement: "ATTENTE",
+            },
+          },
+        },
       });
 
       total_crees += taille;

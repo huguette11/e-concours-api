@@ -6,13 +6,14 @@ const router = Router();
 const ctrl   = new ExamenController();
 
 router.use(AuthMiddleware.protect);
-router.use(AuthMiddleware.CompteVerifier);
-router.get("/concours/:id_concours",  (req, res) => ctrl.getExamensDuConcours(req, res));
 
+// Examens d'un concours
+router.get("/concours/:id_concours", (req, res) => ctrl.getExamensDuConcours(req, res));
 
-router.get("/detail/:id_examen",      (req, res) => ctrl.getExamen(req, res));
+// Détail d'un examen + mon résultat
+router.get("/detail/:id_examen",     (req, res) => ctrl.getExamen(req, res));
 
-
-router.get("/mes-resultats",          (req, res) => ctrl.getMesResultats(req, res));
+// Tous mes résultats groupés par concours
+router.get("/mes-resultats",         (req, res) => ctrl.getMesResultats(req, res));
 
 export default router;

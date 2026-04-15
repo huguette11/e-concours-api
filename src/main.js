@@ -11,6 +11,7 @@ import paiementRoutes from "./routes/paiement.route.js";
 import concoursRoutes from "./routes/concours.route.js";
 import { limiter } from "./middleware/rateLimiter.js";
 import { Cron } from "./cron/Cron.js";
+import { ensureBucketExists } from "./config/minio.js";
 
 const app = express();
 
@@ -35,6 +36,7 @@ const corsOptions = {
   },
   credentials: true,
 };
+await ensureBucketExists('e-concours');
 
 app.use(cors(corsOptions));
 app.use(helmet());
@@ -43,10 +45,11 @@ app.use(limiter)
 
 app.use("/api/inscription", inscriptionRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/candidats", candidatRoutes);
+app.use("/api/candidat", candidatRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/payment",paiementRoutes)
 app.use("/api/concours",concoursRoutes)
+
 
 swaggerDocs(app, PORT);
 

@@ -199,10 +199,19 @@ model examen {
 // ─────────────────────────────────────────────
 // DOCUMENT
 // ─────────────────────────────────────────────
+enum TypeDocument {
+  CEP
+  BEPC
+  BEP
+  BAC
+  LICENCE
+  MASTER
+  DOCTORAT
 
+}
 model document {
   id_document   Int      @id @default(autoincrement())
-  type_document String   @db.VarChar(100)
+  type_document TypeDocument   
   fichier       String   @db.VarChar(500)
   date_upload   DateTime @default(now()) @db.Timestamp(6)
   id_candidat   String   @db.Uuid

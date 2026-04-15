@@ -1191,14 +1191,148 @@ export class AdminController {
     }
   }
 
-  static async CreateLieuxComposition(req,res) {
-    try{
+  static async CreateExamen(req, res) {
+  try {
+    const {
+      intitule,
+      type_examen,
+      coefficient,
+      date_examen,
+      heure,
+      lieu,
+      id_concours
+    } = req.body;
 
-    }
-    catch(err){
+    // Vérifier concours
+    const concours = await prisma.concours.findUnique({
+      where: { id_concours }
+    });
 
+    if (!concours) {
+      return res.status(404).json({ error: "Concours introuvable" });
     }
+
+    const examen = await prisma.examen.create({
+      data: {
+        intitule,
+        type_examen,
+        coefficient,
+        date_examen: new Date(date_examen),
+        heure: heure ? new Date(heure) : null,
+        lieu,
+        id_concours
+      }
+    });
+
+    return res.status(201).json({
+      message: "Examen créé avec succès",
+      data: examen
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
+}
+
+  static async GetExamensByConcours(req, res) {
+  try {
+    const { id_concours } = req.params;
+
+    const examens = await prisma.examen.findMany({
+      where: { id_concours: parseInt(id_concours) },
+      orderBy: { date_examen: "asc" }
+    });
+
+    return res.status(200).json({ data: examens });
+
+  } catch (err) {
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+
+  static async DetailExamen(req, res) {
+  try {
+    const { id_examen } = req.params;
+
+    const examen = await prisma.examen.findUnique({
+      where: { id_examen: parseInt(id_examen) },
+      include: {
+        concours: {
+          select: { nom: true, annee: true }
+        }
+      }
+    });
+
+    if (!examen) {
+      return res.status(404).json({ error: "Examen non trouvé" });
+    }
+
+    return res.status(200).json({ data: examen });
+
+  } catch (err) {
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+  static async UpdateExamen(req, res) {
+  try {
+    const { id_examen } = req.params;
+    const data = req.body;
+
+    const examen = await prisma.examen.findUnique({
+      where: { id_examen: parseInt(id_examen) }
+    });
+
+    if (!examen) {
+      return res.status(404).json({ error: "Examen introuvable" });
+    }
+
+    const updated = await prisma.examen.update({
+      where: { id_examen: parseInt(id_examen) },
+      data: {
+        intitule: data.intitule ?? examen.intitule,
+        type_examen: data.type_examen ?? examen.type_examen,
+        coefficient: data.coefficient ?? examen.coefficient,
+        date_examen: data.date_examen ? new Date(data.date_examen) : examen.date_examen,
+        heure: data.heure ? new Date(data.heure) : examen.heure,
+        lieu: data.lieu ?? examen.lieu
+      }
+    });
+
+    return res.status(200).json({
+      message: "Examen mis à jour",
+      data: updated
+    });
+
+  } catch (err) {
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+}   
+  static async DeleteExamen(req, res) {
+  try {
+    const { id_examen } = req.params;
+
+    const examen = await prisma.examen.findUnique({
+      where: { id_examen: parseInt(id_examen) }
+    });
+
+    if (!examen) {
+      return res.status(404).json({ error: "Examen introuvable" });
+    }
+
+    await prisma.examen.delete({
+      where: { id_examen: parseInt(id_examen) }
+    });
+
+    return res.status(200).json({
+      message: "Examen supprimé avec succès"
+    });
+
+  } catch (err) {
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+
 
   // verifie et repartie les centres
 
