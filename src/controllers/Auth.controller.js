@@ -209,6 +209,11 @@ export class AuthController {
         return res.status(400).json({ error: "OTP expire" });
       }
 
+      // console.log(typeof candidat.otp);
+      // console.log(typeof (otp.toString()))
+      if (typeof otp === 'number' ){
+        const otp = otp.toString()
+      } 
       if (candidat.otp !== otp) {
         return res.status(400).json({ error: "OTP incorrect" });
       }
