@@ -18,7 +18,7 @@ export class ConcoursController {
         return res.status(200).json(JSON.parse(cached));
       }
 
-      console.log("Cache miss pour categorie → DB call");
+      console.log("Cache miss pour categorie DB call");
 
       const [categorie, total] = await Promise.all([
         prisma.categorieConcours.findMany({
@@ -168,6 +168,59 @@ static async DetailConcours(req, res) {
     return res.status(500).json({ error: "Une erreur est survenue" });
   }
 }
+
+static async GetCategorieConcours(req, res) {
+    try {
+      const page = parseInt(req.params.page) || 1;
+      const limit = 10;
+      const skip = (page - 1) * limit;
+
+      const cacheKey = `categorieConcours:${page}:limit:${limit}`;
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        // console.log('cache recuperer',cached)
+        return res.status(200).json(JSON.parse(cached));
+
+      }
+
+      const [concours, total] = await Promise.all([
+        await prisma.categorieConcours.findMany({
+          take: limit,
+          skip,
+          orderBy: { createdDate: "desc" },
+          select: {
+            id: true,
+            libelle: true,
+            concours: {
+              select: {
+                id_concours: true,
+                nom: true,
+              },
+            },
+          },
+        }),
+        await prisma.categorieConcours.count(),
+      ]);
+
+      if (!concours) {
+        return res.status(404).json({ error: "aucun concours trouver" });
+      }
+
+      const response = {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        data: concours,
+      };
+
+      await redis.set(cacheKey, JSON.stringify(response), "EX", 60);
+      return res.status(200).json(response);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: "une erreur est survenue" });
+    }
+  }
 
   
 }

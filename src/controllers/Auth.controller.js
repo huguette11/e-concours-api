@@ -41,7 +41,7 @@ export class AuthController {
           .json({ error: "telephone et mot de passe requis" });
       }
 
-      const candidat = await prisma.candidat.findUnique({
+      const candidat = await prisma.candidat.findFirst({
         where: { telephone:telephone },
       });
 
@@ -209,7 +209,9 @@ export class AuthController {
         return res.status(400).json({ error: "OTP expire" });
       }
 
-      if (candidat.otp !== otp) {
+      if (candidat.otp !=otp) {
+        console.log("OTP fourni:", otp);
+        console.log("OTP attendu:", candidat.otp);
         return res.status(400).json({ error: "OTP incorrect" });
       }
 

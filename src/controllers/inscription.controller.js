@@ -57,10 +57,13 @@ export class InscriptionController {
         });
       }
 
-      const aujourd_hui = new Date();
+      const aujourd_hui = new Date().toLocaleDateString('fr-FR');
+      const debut = (concours.date_debut).toLocaleDateString('fr-FR')
+      const fin = (concours.date_fin).toLocaleDateString('fr-FR')
+      // console.log( aujourd_hui )
       if (
-        aujourd_hui < concours.date_debut ||
-        aujourd_hui > concours.date_fin
+        aujourd_hui < debut ||
+        aujourd_hui > fin
       ) {
         return res.status(400).json({
           error: "La période d'inscription est fermée",
@@ -126,12 +129,16 @@ export class InscriptionController {
 
   static async getInscription(req, res) {
     try {
-      const id_candidat = req.user.id;
+      const {id_candidat} = req.user;
       const id_inscription = parseInt(req.params.id_inscription);
 
       if (isNaN(id_inscription)) {
         return res.status(400).json({ error: "id_inscription invalide" });
       }
+
+      // verifier si l'inscriptions l'appartient bien 
+
+      
 
       const inscription = await prisma.inscription.findFirst({
         where: { id_inscription, id_candidat },
@@ -139,6 +146,7 @@ export class InscriptionController {
           id_inscription: true,
           date_inscription: true,
           statut_inscription: true,
+          id_candidat:true,
           concours: {
             select: {
               nom: true,
@@ -164,6 +172,10 @@ export class InscriptionController {
 
       if (!inscription) {
         return res.status(404).json({ error: "Inscription introuvable" });
+      }
+
+      if (inscription.id_candidat !== id_candidat){
+        return res.status(200).json('text reussi')
       }
 
       const paiement = inscription.paiement[0] ?? null;

@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import { getMinioClient } from '../config/minio.js'; 
 export const generateReceipt = async (data, res) => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -541,3 +542,23 @@ export const GenererListCandidat = async (data, res) => {
 export const GenererListConcours = async (data,res)=>{
   
 }
+
+
+
+
+/**
+ * Upload un fichier vers MinIO
+ * @param {string} bucket
+ * @param {string} objectName  
+ * @param {Buffer} buffer
+ * @param {string} mimetype
+ */
+export const uploadToMinio = async (bucket, objectName, buffer, mimetype) => {
+  const client = getMinioClient();
+
+  await client.putObject(bucket, objectName, buffer, buffer.length, {
+    'Content-Type': mimetype,
+  });
+
+  return objectName;
+};

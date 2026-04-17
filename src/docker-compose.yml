@@ -1,11 +1,10 @@
-
 services:
 
   minio:
     image: quay.io/minio/minio:latest
     container_name: e-concours-minio
     restart: unless-stopped
-    command: server /data --console-address ":9041"
+    command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
@@ -25,14 +24,38 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+<<<<<<<<< Temporary merge branch 1
+    command: redis-server --appendonly yes
+=========
+    command: redis-server --appendonly yes 
+>>>>>>>>> Temporary merge branch 2
     networks:
       - e-concours-network
 
+  postgres:
+    image: postgres:15-alpine
+    container_name: e-concours-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: e_concours
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - e-concours-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   minio_data:
   redis_data:
+  postgres_data:
 
 networks:
   e-concours-network:

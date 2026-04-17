@@ -1,39 +1,40 @@
 import { prisma } from "../prisma.js";
 import bcrypt from "bcrypt";
+import { uploadToMinio } from "../services/Upload-file.service.js";
+import pkg from '../generated/prisma/index.js';
+const { TypeDocument } = pkg;
 
 export class CandidatController {
-
- 
- static async getProfil(req, res) {
+  static async getProfil(req, res) {
     try {
-      const id_candidat = req.user.id;
+      const {id_candidat} = req.user;
 
       const candidat = await prisma.candidat.findUnique({
         where: { id_candidat },
         select: {
-          nom:             true,
-          prenom:          true,
+          nom: true,
+          prenom: true,
           nom_jeune_fille: true,
-          sexe:            true,
-          date_naissance:  true,
-          lieu_naissance:  true,
-          pays_naissance:  true,
-          numero_cnib:     true,
+          sexe: true,
+          date_naissance: true,
+          lieu_naissance: true,
+          pays_naissance: true,
+          numero_cnib: true,
           date_delivrance: true,
-          telephone:       true,
-          email:           true,
-          type_candidat:   true,
-          emploi:          true,
-          matricule:       true,
-          ministere:       true,
-          statut_compte:   true,
-          recepisse:       true,
-          date_creation:   true,
+          telephone: true,
+          email: true,
+          type_candidat: true,
+          emploi: true,
+          matricule: true,
+          ministere: true,
+          statut_compte: true,
+          recepisse: true,
+          date_creation: true,
           document: {
             select: {
               type_document: true,
-              fichier:       true,
-              date_upload:   true,
+              fichier: true,
+              date_upload: true,
             },
           },
         },
@@ -47,16 +48,15 @@ export class CandidatController {
         message: "Profil récupéré",
         data: candidat,
       });
-
     } catch (err) {
       console.error(err);
       return res.status(500).json({ error: "Erreur serveur" });
     }
   }
 
- static  async updateProfil(req, res) {
+  static async updateProfil(req, res) {
     try {
-      const id_candidat = req.user.id;
+      const {id_candidat} = req.user;
       const {
         telephone,
         lieu_naissance,
@@ -77,12 +77,12 @@ export class CandidatController {
       }
 
       const dataToUpdate = {};
-      if (telephone)       dataToUpdate.telephone       = telephone;
-      if (lieu_naissance)  dataToUpdate.lieu_naissance  = lieu_naissance;
+      if (telephone) dataToUpdate.telephone = telephone;
+      if (lieu_naissance) dataToUpdate.lieu_naissance = lieu_naissance;
       if (nom_jeune_fille) dataToUpdate.nom_jeune_fille = nom_jeune_fille;
-      if (emploi)          dataToUpdate.emploi          = emploi;
-      if (ministere)       dataToUpdate.ministere       = ministere;
-      if (matricule)       dataToUpdate.matricule       = matricule;
+      if (emploi) dataToUpdate.emploi = emploi;
+      if (ministere) dataToUpdate.ministere = ministere;
+      if (matricule) dataToUpdate.matricule = matricule;
 
       if (nouveau_mot_de_passe) {
         if (!ancien_mot_de_passe) {
@@ -92,7 +92,7 @@ export class CandidatController {
         }
         const correct = await bcrypt.compare(
           ancien_mot_de_passe,
-          candidat.mot_de_passe
+          candidat.mot_de_passe,
         );
         if (!correct) {
           return res.status(401).json({
@@ -110,17 +110,17 @@ export class CandidatController {
 
       const updated = await prisma.candidat.update({
         where: { id_candidat },
-        data:  dataToUpdate,
+        data: dataToUpdate,
         select: {
-          nom:             true,
-          prenom:          true,
-          email:           true,
-          telephone:       true,
-          lieu_naissance:  true,
+          nom: true,
+          prenom: true,
+          email: true,
+          telephone: true,
+          lieu_naissance: true,
           nom_jeune_fille: true,
-          emploi:          true,
-          matricule:       true,
-          ministere:       true,
+          emploi: true,
+          matricule: true,
+          ministere: true,
         },
       });
 
@@ -128,135 +128,132 @@ export class CandidatController {
         message: "Profil mis à jour",
         data: updated,
       });
-
     } catch (err) {
       console.error(err);
       return res.status(500).json({ error: "Erreur serveur" });
     }
   }
 
+  // static async getMesCandidatures(req, res) {
+  //   try {
+  //     const {id_candidat} = req.user;
 
-  static async getMesCandidatures(req, res) {
+  //     const inscriptions = await prisma.inscription.findMany({
+  //       where: { id_candidat },
+  //       select:{
+  //         id_inscription:true,
+       
+  //         concours: {
+  //           select: {
+  //             nom: true,
+  //             type: true,
+  //             frais_inscription: true,
+  //             statut_concours: true,
+  //           },
+  //         },
+  //         paiement: {
+  //           select: {
+  //             statut_paiement: true,
+  //             reference_transaction: true,
+  //             mode_paiement: true,
+  //             date_paiement: true,
+  //             montant: true,
+  //           },
+  //           orderBy: { date_paiement: "desc" },
+  //           take: 1,
+  //         },
+  //       },
+  //       orderBy: { date_inscription: "desc" },
+  //     });
+
+  //     const data = inscriptions.map((insc) => {
+  //       const dernierPaiement = insc.paiement[0] ?? null;
+  //       return {
+  //         id_inscription : insc.id_inscription,
+  //         date_inscription: insc.date_inscription,
+  //         statut_inscription: insc.statut_inscription,
+  //         concours: insc.concours,
+  //         paiement: dernierPaiement,
+  //         recepisse_disponible: dernierPaiement?.statut_paiement === "REUSSI",
+  //       };
+  //     });
+
+  //     return res.status(200).json({
+  //       message: "Candidatures récupérées",
+  //       data,
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //     return res.status(500).json({ error: "Erreur serveur" });
+  //   }
+  // }
+
+  // static async getRecepisse(req, res) {
+  //   try {
+  //     const {id_candidat} = req.user;
+  //     const id_inscription = parseInt(req.params.id_inscription);
+
+  //     if (isNaN(id_inscription)) {
+  //       return res.status(400).json({ error: "id_inscription invalide" });
+  //     }
+
+  //     const inscription = await prisma.inscription.findFirst({
+  //       where: { id_inscription, id_candidat },
+  //       include: {
+  //         concours: { select: { nom: true } },
+  //         paiement: {
+  //           orderBy: { date_paiement: "desc" },
+  //           take: 1,
+  //         },
+  //       },
+  //     });
+
+  //     if (!inscription) {
+  //       return res.status(404).json({ error: "Inscription introuvable" });
+  //     }
+
+  //     const paiement = inscription.paiement[0] ?? null;
+
+  //     if (!paiement || paiement.statut_paiement !== "REUSSI") {
+  //       return res.status(404).json({
+  //         error: "Récépissé non disponible, paiement en attente",
+  //       });
+  //     }
+
+  //     const candidat = await prisma.candidat.findUnique({
+  //       where: { id_candidat },
+  //       select: { nom: true, prenom: true, numero_cnib: true },
+  //     });
+
+  //     return res.status(200).json({
+  //       message: "Données récépissé",
+  //       data: {
+  //         candidat: `${candidat.nom} ${candidat.prenom}`,
+  //         numero_cnib: candidat.numero_cnib,
+  //         concours: inscription.concours.nom,
+  //         date_inscription: inscription.date_inscription,
+  //         montant_paye: paiement.montant,
+  //         reference_transaction: paiement.reference_transaction,
+  //       },
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //     return res.status(500).json({ error: "Erreur serveur" });
+  //   }
+  // }
+
+  static async getResultats(req, res) {
     try {
-      const id_candidat = req.user.id;
-
-      const inscriptions = await prisma.inscription.findMany({
-        where: { id_candidat },
-        include: {
-          concours: {
-            select: {
-              nom:               true,
-              type:              true,
-              frais_inscription: true,
-              statut_concours:   true,
-            },
-          },
-          paiement: {
-            select: {
-              statut_paiement:       true,
-              reference_transaction: true,
-              mode_paiement:         true,
-              date_paiement:         true,
-              montant:               true,
-            },
-            orderBy: { date_paiement: "desc" },
-            take: 1,
-          },
-        },
-        orderBy: { date_inscription: "desc" },
-      });
-
-      const data = inscriptions.map((insc) => {
-        const dernierPaiement = insc.paiement[0] ?? null;
-        return {
-          date_inscription:    insc.date_inscription,
-          statut_inscription:  insc.statut_inscription,
-          concours:            insc.concours,
-          paiement:            dernierPaiement,
-          recepisse_disponible: dernierPaiement?.statut_paiement === "REUSSI",
-        };
-      });
-
-      return res.status(200).json({
-        message: "Candidatures récupérées",
-        data,
-      });
-
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erreur serveur" });
-    }
-  }
-
-
-  static async getRecepisse(req, res) {
-    try {
-      const id_candidat    = req.user.id;
-      const id_inscription = parseInt(req.params.id_inscription);
-
-      if (isNaN(id_inscription)) {
-        return res.status(400).json({ error: "id_inscription invalide" });
-      }
-
-      const inscription = await prisma.inscription.findFirst({
-        where: { id_inscription, id_candidat },
-        include: {
-          concours: { select: { nom: true } },
-          paiement: {
-            orderBy: { date_paiement: "desc" },
-            take: 1,
-          },
-        },
-      });
-
-      if (!inscription) {
-        return res.status(404).json({ error: "Inscription introuvable" });
-      }
-
-      const paiement = inscription.paiement[0] ?? null;
-
-      if (!paiement || paiement.statut_paiement !== "REUSSI") {
-        return res.status(404).json({
-          error: "Récépissé non disponible, paiement en attente",
-        });
-      }
-
-      const candidat = await prisma.candidat.findUnique({
-        where: { id_candidat },
-        select: { nom: true, prenom: true, numero_cnib: true },
-      });
-
-      return res.status(200).json({
-        message: "Données récépissé",
-        data: {
-          candidat:              `${candidat.nom} ${candidat.prenom}`,
-          numero_cnib:           candidat.numero_cnib,
-          concours:              inscription.concours.nom,
-          date_inscription:      inscription.date_inscription,
-          montant_paye:          paiement.montant,
-          reference_transaction: paiement.reference_transaction,
-        },
-      });
-
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erreur serveur" });
-    }
-  }
-
-  
-   static async getResultats(req, res) {
-    try {
-      const id_candidat = req.user.id;
+      const {id_candidat} = req.user;
 
       const resultats = await prisma.resultat.findMany({
         where: { id_candidat },
         include: {
           examen: {
             select: {
-              intitule:    true,
+              intitule: true,
               date_examen: true,
-              lieu:        true,
+              lieu: true,
               type_examen: true,
               coefficient: true,
               concours: {
@@ -274,19 +271,19 @@ export class CandidatController {
         if (!acc[nomConcours]) {
           acc[nomConcours] = {
             concours: r.examen.concours,
-            examens:  [],
+            examens: [],
           };
         }
 
         acc[nomConcours].examens.push({
-          intitule:         r.examen.intitule,
-          type_examen:      r.examen.type_examen,
-          date_examen:      r.examen.date_examen,
-          lieu:             r.examen.lieu,
-          coefficient:      r.examen.coefficient,
-          note:             r.note,
+          intitule: r.examen.intitule,
+          type_examen: r.examen.type_examen,
+          date_examen: r.examen.date_examen,
+          lieu: r.examen.lieu,
+          coefficient: r.examen.coefficient,
+          note: r.note,
           moyenne_generale: r.moyenne_generale,
-          statut:           r.statut,
+          statut: r.statut,
         });
 
         return acc;
@@ -294,15 +291,80 @@ export class CandidatController {
 
       return res.status(200).json({
         message: "Résultats récupérés",
-        data:    Object.values(parConcours),
+        data: Object.values(parConcours),
       });
-
     } catch (err) {
       console.error(err);
       return res.status(500).json({ error: "Erreur serveur" });
     }
   }
 
+static async uploadDocuments(req, res, next) {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "Aucun fichier fourni." });
+    }
+
+    const { id_candidat } = req.user;
 
   
+    const types = Array.isArray(req.body.type_document)
+      ? req.body.type_document
+      : [req.body.type_document];
+
+
+    if (types.length !== req.files.length) {
+      return res.status(400).json({
+        message: `Le nombre de types (${types.length}) ne correspond pas au nombre de fichiers (${req.files.length}).`,
+      });
+    }
+
+    // Valider tous les types
+    const typesInvalides = types.filter(
+      (t) => !Object.values(TypeDocument).includes(t)
+    );
+    if (typesInvalides.length > 0) {
+      return res.status(400).json({
+        message: "Types de documents invalides.",
+        types_invalides: typesInvalides,
+        valeurs_acceptees: Object.values(TypeDocument),
+      });
+    }
+
+    const uploadedDocs = [];
+
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      const type_document = types[i]; 
+
+      const objectName = `candidats/${id_candidat}/${type_document}-${uuidv4()}.pdf`;
+
+      await uploadToMinio(
+        process.env.MINIO_BUCKET,
+        objectName,
+        file.buffer,
+        file.mimetype,
+      );
+
+      const doc = await prisma.document.create({
+        data: {
+          id_candidat,
+          type_document,
+          fichier: objectName,
+          date_upload: new Date(),
+        },
+      });
+
+      uploadedDocs.push(doc);
+    }
+
+    return res.status(201).json({
+      message: `${uploadedDocs.length} fichier(s) uploadé(s) avec succès.`,
+      documents: uploadedDocs,
+    });
+
+  } catch (err) {
+    next(err);
+  }
+}
 }

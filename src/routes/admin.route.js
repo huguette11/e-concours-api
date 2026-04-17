@@ -6,6 +6,7 @@ import { AdminMiddleware } from "../middleware/Admin.Middleware.js";
 import { ConcoursDto } from "../Dtos/ConcoursDto.js";
 import { CategorieDto } from "../Dtos/CategorieDto.js";
 import { PaiementController } from "../controllers/Paiement.controller.js";
+import { ExaenDto } from "../Dtos/ExamenDto.js";
 
 const router = express.Router();
 
@@ -47,7 +48,7 @@ router.get('/liste-paiement',AdminController.ListesPaiements);
 router.get('/candidats/search',AdminController.SearchCandidat)
 
 
-router.post("/examen", AdminController.CreateExamen);
+router.post("/examen",...validate(ExaenDto.ValidateCreateExam() ),AdminController.CreateExamen);
 router.get("/examen/concours/:id_concours", AdminController.GetExamensByConcours);
 router.get("/examen/:id_examen", AdminController.DetailExamen);
 router.put("/examen/:id_examen", AdminController.UpdateExamen);
