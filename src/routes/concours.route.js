@@ -6,8 +6,8 @@ import { AdminController } from "../controllers/Admin.controller.js";
 const router = Router();
 
 
-// router.get("/", ConcoursController.GetCategorieConcours);
-// router.get("/:id", ConcoursController.DetailConcours);
+router.get("/", ConcoursController.GetCategorieConcours);
+router.get("/:id", ConcoursController.DetailConcours);
 
 // Liste de tous les concours
 router.get("/",                        (req, res) => ConcoursController.GetAllConcours(req, res));
@@ -16,6 +16,7 @@ router.get("/",                        (req, res) => ConcoursController.GetAllCo
 router.get("/detail/:id_concours",     (req, res) => ConcoursController.DetailConcours(req, res));
 
 // Liste des catégories
-router.get("/categories",              (req, res) => ConcoursController.GetCategorie(req, res));
+router.get("/categories", ConcoursController.GetCategorie);
+
 
 export default router;

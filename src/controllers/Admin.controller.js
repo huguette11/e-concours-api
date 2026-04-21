@@ -367,19 +367,11 @@ export class AdminController {
             date_fin: new Date(date_fin),
             statut_concours,
             id_admin,
-            categorieId,
+            categorieId:categorieId,
             centres: {
               create: centres.map((id_centre) => ({
                 centre: { connect: { id_centre } },
               })),
-            },
-          },
-          include: {
-            centres: {
-              select: {
-                centre: { select: { nom: true, id_centre: true } },
-              },
-              categorie: { select: { libelle: true } },
             },
           },
         });
@@ -389,7 +381,6 @@ export class AdminController {
 
       return res.status(201).json({
         message: `Concours ${concoursCreate.nom} créé avec succès`,
-        data: concoursCreate,
       });
     } catch (err) {
       console.error(err);
@@ -1247,6 +1238,7 @@ export class AdminController {
     return res.status(200).json({ data: examens });
 
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 }
