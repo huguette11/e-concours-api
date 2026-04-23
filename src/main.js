@@ -54,7 +54,7 @@ app.use("/api/concours",concoursRoutes)
 swaggerDocs(app, PORT);
 
 app.get("/", (req, res) => {
-  res.send("API e-concours opérationnelle");
+  res.send("API e-concours opérationnelle!!");
 });
 
 // await connection.set("test", "ioredis fonctionne !");
