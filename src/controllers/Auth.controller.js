@@ -18,6 +18,10 @@ export class AuthController {
     this.VerifieNumber = this.VerifieNumber.bind(this);
   }
 
+  static async #ValidatePhone(telephone){
+
+  }
+
   async VerifieNumber(req, res) {
     try {
       const { tel } = req.body;
@@ -318,8 +322,18 @@ export class AuthController {
           break;
       }
 
+            const refreshToken = jwt.sign(
+        {
+          id: candidat.id_candidat,
+          email: candidat.email,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "5h" },
+      );
+
       res.json({
         message: "Code OTP envoyé pour réinitialisation du mot de passe",
+        token : refreshToken
       });
     } catch (err) {
       console.error(err);
