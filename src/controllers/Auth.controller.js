@@ -1,9 +1,23 @@
-import { prisma }         from "../prisma.js";
-import bcrypt             from "bcrypt";
-import jwt                from "jsonwebtoken";
+import { prisma }          from "../prisma.js";
+import bcrypt              from "bcrypt";
+import jwt                 from "jsonwebtoken";
 import { contactTemplate } from "../services/templates/Mail/contactUs.js";
 import { sendMailContact } from "../config/mailer.js";
 import { connection }      from "../config/redis.js";
+
+function ValidatePhone(value) {
+  if (!value) return { valid: false, message: "Numéro requis" };
+  const cleaned = value.replace(/\s+/g, "");
+  const match   = cleaned.match(/^(\+?226)?(\d{8})$/);
+  if (!match) {
+    return {
+      valid:   false,
+      message: "Numéro invalide. Ex : 70000000 ou +22670000000",
+    };
+  }
+  const local = match[2];
+  return { valid: true, formatted: `226${local}` };
+}
 
 export class AuthController {
   constructor(notificationService) {
@@ -23,13 +37,15 @@ export class AuthController {
   async VerifieNumber(req, res) {
     try {
       const { tel } = req.body;
-      const cachekey = `verif-${tel}`;
-      this.notificationService.telephone = tel;
-       const otp = this.notificationService.genererOtp();
+      const { valid, formatted, message } = ValidatePhone(tel);
+      if (!valid) return res.status(400).json({ error: message });
+
+      const cachekey   = `verif-${formatted}`;
+      const otp        = this.notificationService.genererOtp();
       const otp_expiration = new Date(Date.now() + 10 * 60 * 1000);
 
       const candidat = await prisma.candidat.findFirst({
-        where: { telephone: tel },
+        where: { telephone: formatted },
       });
 
       if (!candidat) {
@@ -38,10 +54,11 @@ export class AuthController {
 
       await prisma.candidat.update({
         where: { id_candidat: candidat.id_candidat },
-        data: { otp, otp_expiration },
+        data:  { otp, otp_expiration },
       });
 
-      this.notificationService.telephone = tel;
+      await connection.set(cachekey, otp, "EX", 600);
+      this.notificationService.telephone = formatted;
       await this.notificationService.envoyerOtpTelephone(otp);
 
       return res.status(200).json({ message: "OTP envoyé" });
@@ -55,14 +72,15 @@ export class AuthController {
     try {
       const { telephone, mot_de_passe } = req.body;
 
-      if (!telephone || !mot_de_passe) {
-        return res.status(400).json({
-          error: "Téléphone et mot de passe requis",
-        });
+      const { valid, formatted, message } = ValidatePhone(telephone);
+      if (!valid) return res.status(400).json({ error: message });
+
+      if (!mot_de_passe) {
+        return res.status(400).json({ error: "Mot de passe requis" });
       }
 
       const candidat = await prisma.candidat.findFirst({
-        where: { telephone },
+        where: { telephone: formatted },
       });
 
       if (!candidat) {
@@ -101,13 +119,12 @@ export class AuthController {
         mot_de_passe, matricule, emploi, ministere, choix,
       } = req.body;
 
-      if (!telephone) {
-        return res.status(400).json({
-          error: "Le numéro de téléphone est obligatoire",
-        });
-      }
+      // Validation et formatage du téléphone
+      const { valid, formatted, message } = ValidatePhone(telephone);
+      if (!valid) return res.status(400).json({ error: message });
 
-      const conditions = [{ numero_cnib }, { telephone }];
+      // Vérifier les doublons
+      const conditions = [{ numero_cnib }, { telephone: formatted }];
       if (email) conditions.push({ email });
 
       const existant = await prisma.candidat.findFirst({
@@ -115,10 +132,10 @@ export class AuthController {
       });
 
       if (existant) {
-        let message = "Numéro CNIB déjà utilisé";
-        if (existant.telephone === telephone) message = "Téléphone déjà utilisé";
-        if (email && existant.email === email) message = "Email déjà utilisé";
-        return res.status(409).json({ error: message });
+        let msg = "Numéro CNIB déjà utilisé";
+        if (existant.telephone === formatted) msg = "Téléphone déjà utilisé";
+        if (email && existant.email === email) msg = "Email déjà utilisé";
+        return res.status(409).json({ error: msg });
       }
 
       const motDePasseHashe = await bcrypt.hash(mot_de_passe, 10);
@@ -136,7 +153,7 @@ export class AuthController {
           pays_naissance,
           numero_cnib,
           date_delivrance:    date_delivrance ? new Date(date_delivrance) : null,
-          telephone,
+          telephone:          formatted,  // numéro formaté
           email:              email ?? null,
           mot_de_passe:       motDePasseHashe,
           statut_compte:      "INACTIF",
@@ -198,7 +215,9 @@ export class AuthController {
         return res.status(400).json({ error: "OTP expiré" });
       }
 
-      if (candidat.otp !== otp) {
+      // Convertir en string au cas où le client envoie un nombre
+      const otpString = otp.toString();
+      if (candidat.otp !== otpString) {
         return res.status(400).json({ error: "OTP incorrect" });
       }
 
@@ -302,10 +321,17 @@ export class AuthController {
         await this.notificationService.envoyerOtpEmail(otp);
       }
 
+      const token = jwt.sign(
+        { id: candidat.id_candidat, email: candidat.email, role: "candidat" },
+        process.env.JWT_SECRET,
+        { expiresIn: "5h" },
+      );
+
       return res.status(200).json({
         message: candidat.choix_notification === "sms"
           ? "OTP envoyé par SMS"
           : "OTP envoyé par email",
+        token,
       });
 
     } catch (err) {
@@ -316,7 +342,7 @@ export class AuthController {
 
   async ResetPassword(req, res) {
     try {
-      const { mot_de_passe, otp } = req.body; // ← plus de parenthèses
+      const { mot_de_passe, otp } = req.body;
       const { id_candidat }       = req.user;
 
       const candidat = await prisma.candidat.findUnique({
@@ -327,7 +353,7 @@ export class AuthController {
         return res.status(404).json({ error: "Candidat introuvable" });
       }
 
-      if (candidat.otp !== otp) {
+      if (candidat.otp !== otp.toString()) {
         return res.status(400).json({ error: "Code OTP incorrect" });
       }
 
