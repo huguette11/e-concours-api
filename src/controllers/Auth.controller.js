@@ -406,7 +406,7 @@ export class AuthController {
 
     const UpdateCandidat = await prisma.$transaction(async (tx) => {
       const updatedC = await tx.candidat.update({
-        where: { id: candidat.id_candidat },
+        where: { id_candidat: candidat.id_candidat },
         data: {
           mot_de_passe: mdphash,
           otp: null,
