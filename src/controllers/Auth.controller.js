@@ -324,7 +324,7 @@ export class AuthController {
         return res.status().json(message)
       }
       if (formatted && choix === "sms") {
-        candidat = await prisma.candidat.findFirst({ where: { formatted } });
+        candidat = await prisma.candidat.findFirst({ where: { telephone:formatted } });
       } else {
         candidat = await prisma.candidat.findUnique({ where: { email } });
       }
