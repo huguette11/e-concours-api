@@ -404,7 +404,7 @@ export class AuthController {
 
     const mdphash = await bcrypt.hash(mot_de_passe, 10);
 
-    const UpdateCandidat = await prisma.candidat.$transaction(async (tx) => {
+    const UpdateCandidat = await prisma.$transaction(async (tx) => {
       const updatedC = await tx.candidat.update({
         where: { id: candidat.id_candidat },
         data: {
