@@ -5,6 +5,21 @@ import jwt from "jsonwebtoken";
 import { contactTemplate } from "../services/templates/Mail/contactUs.js";
 import { sendMailContact } from "../config/mailer.js";
 import { connection } from "../config/redis.js";
+import { authController } from "../container.js";
+
+function   ValidatePhone(value) {
+    const cleaned = value.replace(/\s+/g, "");
+    const match = cleaned.match(/^(\+?226)?(\d{8})$/);
+    if (!match)
+      return {
+        valid: false,
+        message: "Numéro invalide. Ex : 70000000 ou +22670000000",
+      };
+    const local = match[2];
+    return { valid: true, formatted: `226${local}` };
+  }
+
+
 export class AuthController {
   constructor(notificationService) {
     this.notificationService = notificationService;
@@ -16,11 +31,9 @@ export class AuthController {
     this.Logout = this.Logout.bind(this);
     this.ResendOtp = this.ResendOtp.bind(this);
     this.VerifieNumber = this.VerifieNumber.bind(this);
+    
   }
 
-  static async #ValidatePhone(telephone){
-
-  }
 
   async VerifieNumber(req, res) {
     try {
@@ -39,15 +52,25 @@ export class AuthController {
     try {
       const { telephone, mot_de_passe } = req.body;
 
-      if (!telephone || !mot_de_passe) {
+      const { valid, formatted, message } =
+             ValidatePhone(telephone);
+
+      if (!valid) {
+        return res.status(400).json({ error: message });
+      }
+        console.log(formatted, valid, message)
+
+      if (!formatted || !mot_de_passe) {
         return res
           .status(400)
           .json({ error: "telephone et mot de passe requis" });
       }
 
       const candidat = await prisma.candidat.findUnique({
-        where: { telephone:telephone },
+        where: { telephone: formatted },
       });
+
+    
 
       if (!candidat) {
         return res.status(404).json({ error: "Candidat non trouvé" });
@@ -104,8 +127,17 @@ export class AuthController {
         choix,
       } = req.body;
 
+         const { valid, formatted, message } =
+             ValidatePhone(telephone);
+
+      if (!valid) {
+        return res.status(400).json({ error: message });
+      }
+        console.log(formatted, valid, message)
+
+
       const existant = await prisma.candidat.findFirst({
-        where: { OR: [{ email }, { numero_cnib }] },
+        where: { OR: [{ email }, { numero_cnib },{telephone:formatted}] },
       });
 
       if (existant) {
@@ -133,7 +165,7 @@ export class AuthController {
             pays_naissance,
             numero_cnib,
             date_delivrance: date_delivrance ? new Date(date_delivrance) : null,
-            telephone,
+            telephone:formatted,
             email,
             mot_de_passe: motDePasseHashe,
             statut_compte: "INACTIF",
@@ -215,9 +247,9 @@ export class AuthController {
 
       // console.log(typeof candidat.otp);
       // console.log(typeof (otp.toString()))
-      if (typeof otp === 'number' ){
-        const otp = otp.toString()
-      } 
+      if (typeof otp === "number") {
+        const otp = otp.toString();
+      }
       if (candidat.otp !== otp) {
         return res.status(400).json({ error: "OTP incorrect" });
       }
@@ -238,7 +270,7 @@ export class AuthController {
 
   async ResendOtp(req, res) {
     try {
-      const { email } = req.body;
+      const { email , telephone} = req.body;
 
       const candidat = await prisma.candidat.findUnique({ where: { email } });
       if (!candidat) {
@@ -286,8 +318,13 @@ export class AuthController {
 
       let candidat;
 
-      if (choix === "sms") {
-        candidat = await prisma.candidat.findFirst({ where: { telephone } });
+      
+      const {formatted,valid,message} = ValidatePhone(telephone)
+      if(!valid){
+        return res.status().json(message)
+      }
+      if (formatted && choix === "sms") {
+        candidat = await prisma.candidat.findFirst({ where: { formatted } });
       } else {
         candidat = await prisma.candidat.findUnique({ where: { email } });
       }
@@ -322,7 +359,7 @@ export class AuthController {
           break;
       }
 
-            const refreshToken = jwt.sign(
+      const refreshToken = jwt.sign(
         {
           id: candidat.id_candidat,
           email: candidat.email,
@@ -333,7 +370,7 @@ export class AuthController {
 
       res.json({
         message: "Code OTP envoyé pour réinitialisation du mot de passe",
-        token : refreshToken
+        token: refreshToken,
       });
     } catch (err) {
       console.error(err);

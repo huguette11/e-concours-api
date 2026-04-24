@@ -87,10 +87,7 @@ static ValidateLogin() {
   return [
     body("telephone")
       .notEmpty()
-      .withMessage("Le téléphone est requis")
-      .withMessage("Numéro de téléphone invalide")
-      .isLength({ min: 8, max: 11})
-      .withMessage("Le numéro doit contenir exactement 8 chiffres"),
+      .withMessage("Le téléphone est requis"),
 
     body("mot_de_passe")
       .notEmpty()
