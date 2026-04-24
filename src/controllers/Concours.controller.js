@@ -153,10 +153,16 @@ static async DetailConcours(req, res) {
       },
     });
 
+
     if (!concours) {
       return res.status(404).json({ error: "Aucun concours trouvé" });
     }
 
+    // parser les dates et affficher en heures francaises
+
+    concours.date_debut = concours.date_debut.toLocaleDateString('fr-FR')
+    concours.date_fin = concours.date_fin.toLocaleDateString('fr-FR');
+    
     const response = { data: concours };
 
 
