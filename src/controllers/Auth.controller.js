@@ -381,7 +381,7 @@ export class AuthController {
   // mots de passe oublier .. methode pour recuperer le mots de passe (changer le password)
 
   async ResetPassword(req, res) {
-    const { mot_de_passe, otp } = req.body();
+    const { mot_de_passe, otp } = req.body;
     const { id_candidat } = req.user;
     const candidat = await prisma.candidat.findUnique({
       where: { id_candidat },
