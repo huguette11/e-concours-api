@@ -11,8 +11,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "StatutInscription" AS ENUM ('EN_ATTENTE', 'VALIDEE', 'ANNULEE');
-
+-- Type StatutInscription déjà existant
 -- AlterTable
 ALTER TABLE "candidat" ALTER COLUMN "lieu_naissance" SET NOT NULL,
 ALTER COLUMN "pays_naissance" SET NOT NULL,

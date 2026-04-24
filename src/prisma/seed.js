@@ -3,34 +3,28 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-// ─── Données de génération ───────────────────────────────────────────────────
-
 const NOMS = [
   "Ouédraogo","Sawadogo","Kaboré","Traoré","Zongo","Compaoré","Tapsoba",
   "Nikiéma","Yameogo","Belem","Sankara","Diallo","Coulibaly","Konaté",
-  "Some","Barro","Dao","Soulama","Tiendrebeogo","Ilboudo","Nignan","Bonkoungou",
-  "Badini","Drabo","Bambara","Guira","Zoungrana","Nacoulma","Lingani","Koala",
+  "Some","Barro","Dao","Soulama","Tiendrebeogo","Ilboudo",
 ];
 
 const PRENOMS_H = [
-  "Issouf","Dramane","Adama","Moussa","Ibrahim","Hamidou","Souleymane","Boureima",
-  "Seydou","Abdoulaye","Salif","Mamadou","Yacouba","Noufou","Daouda","Lassina",
-  "Pingdwendé","Wendpanga","Wendlassida","Romaric","Dimitri","Aristide",
+  "Issouf","Dramane","Adama","Moussa","Ibrahim","Hamidou","Souleymane",
+  "Boureima","Seydou","Abdoulaye","Salif","Mamadou","Yacouba","Noufou",
 ];
 
 const PRENOMS_F = [
-  "Aminata","Mariam","Fatoumata","Rasmata","Aïcha","Salamata","Bintou","Assita",
-  "Nafissatou","Djamila","Maimouna","Kadiatou","Rokiatou","Fanta","Nathalie",
-  "Clarisse","Pascaline","Wendlassida","Raïnatou","Haoua","Salimata",
+  "Aminata","Mariam","Fatoumata","Rasmata","Aïcha","Salamata","Bintou",
+  "Assita","Nafissatou","Djamila","Maimouna","Kadiatou","Rokiatou","Fanta",
 ];
 
 const LIEUX_NAISSANCE = [
   "Ouagadougou","Bobo-Dioulasso","Koudougou","Banfora","Ouahigouya",
-  "Dédougou","Fada N'Gourma","Tenkodogo","Kaya","Ziniaré","Manga","Léo",
-  "Diébougou","Gaoua","Nouna","Tougan","Kongoussi","Titao","Djibo","Dori",
+  "Dédougou","Fada N'Gourma","Tenkodogo","Kaya","Ziniaré",
 ];
 
-const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const rand    = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 function genererDate(anneeMin, anneeMax) {
@@ -40,30 +34,29 @@ function genererDate(anneeMin, anneeMax) {
   return new Date(`${annee}-${String(mois).padStart(2,'0')}-${String(jour).padStart(2,'0')}`);
 }
 
-// ─── Main ────────────────────────────────────────────────────────────────────
-
 async function main() {
   console.log("🚀 Démarrage du seed...\n");
 
-  // ── ADMIN ──────────────────────────────────────────────────────────────────
+  // ── ADMIN ──────────────────────────────────────────────────
   let admin = await prisma.admin.findUnique({
     where: { email: "admin@econcours.gov.bf" },
   });
   if (!admin) {
     admin = await prisma.admin.create({
       data: {
-        nom: "Admin", prenom: "Super",
-        email: "admin@econcours.gov.bf",
+        nom:          "Admin",
+        prenom:       "Super",
+        email:        "admin@econcours.gov.bf",
         mot_de_passe: await bcrypt.hash("Admin@1234", 10),
-        telephone: "70000000",
-        role: "SUPERADMIN",
-        actif: true,
+        telephone:    "70000000",
+        role:         "SUPERADMIN",
+        actif:        true,
       },
     });
   }
   console.log("✅ Admin prêt");
 
-  // ── CENTRES ────────────────────────────────────────────────────────────────
+  // ── CENTRES ────────────────────────────────────────────────
   const centresData = [
     "Ouagadougou","Bobo-Dioulasso","Koudougou",
     "Banfora","Ouahigouya","Dédougou","Fada N'Gourma","Tenkodogo",
@@ -76,7 +69,7 @@ async function main() {
   }
   console.log(`✅ ${centres.length} centres prêts`);
 
-  // ── LIEUX DE COMPOSITION ──────────────────────────────────────────────────
+  // ── LIEUX DE COMPOSITION ───────────────────────────────────
   const lieuxData = [
     { nom: "Lycée Philippe Zinda Kaboré",  quota: 1500, id_centre: centres[0].id_centre },
     { nom: "Lycée Wemtenga",               quota: 1200, id_centre: centres[0].id_centre },
@@ -99,7 +92,7 @@ async function main() {
   }
   console.log(`✅ ${lieux.length} lieux de composition prêts`);
 
-  // ── CATEGORIES ────────────────────────────────────────────────────────────
+  // ── CATEGORIES ─────────────────────────────────────────────
   const categoriesData = [
     { libelle: "Fonction Publique",  description: "Concours de la fonction publique" },
     { libelle: "Militaire",          description: "Concours des forces armées" },
@@ -118,30 +111,33 @@ async function main() {
   }
   console.log(`✅ ${categories.length} catégories prêtes`);
 
-  // ── CONCOURS ──────────────────────────────────────────────────────────────
+  // ── CONCOURS ───────────────────────────────────────────────
   const concoursData = [
     {
-      nom: "Concours Agents de Santé 2025",
-      type: "DIRECT",
-      description: "Recrutement d'agents paramédicaux pour les hôpitaux nationaux.",
-      frais_inscription: 5000, nombre_postes: 200, annee: 2025,
-      date_debut: new Date("2025-03-01"), date_fin: new Date("2025-04-30"),
-      statut_concours: "OUVERT",
-      categorieId: categories[2].id,
-      centreIds: centres.map(c => c.id_centre), // tous les centres
+      nom:               "Concours Agents de Santé 2025",
+      type:              "DIRECT",
+      description:       "Recrutement d'agents paramédicaux pour les hôpitaux nationaux.",
+      frais_inscription: 5000,
+      nombre_postes:     200,
+      annee:             2025,
+      date_debut:        new Date("2025-03-01"),
+      date_fin:          new Date("2025-04-30"),
+      statut_concours:   "OUVERT",
+      categorieId:       categories[2].id,
+      centreIds:         centres.map(c => c.id_centre),
     },
     {
-      nom: "Concours Enseignants du Primaire 2025",
-      type: "DIRECT",
-      description: "Recrutement d'instituteurs pour les écoles primaires publiques.",
+      nom:               "Concours Enseignants du Primaire 2026",
+      type:              "DIRECT",
+      description:       "Recrutement d'instituteurs pour les écoles primaires publiques.",
       frais_inscription: 3000,
-      nombre_postes: 500,
-      annee: 2026,
-      date_debut: new Date("2026-05-01"),
-      date_fin: new Date("2026-06-30"),
-      statut_concours: "OUVERT",
-      categorieId: categories[3].id,
-      centreIds: centres.map(c => c.id_centre),
+      nombre_postes:     500,
+      annee:             2026,
+      date_debut:        new Date("2026-05-01"),
+      date_fin:          new Date("2026-06-30"),
+      statut_concours:   "OUVERT",
+      categorieId:       categories[3].id,
+      centreIds:         centres.map(c => c.id_centre),
     },
   ];
 
@@ -165,50 +161,105 @@ async function main() {
   }
   console.log(`✅ ${concoursList.length} concours prêts`);
 
-  // ── 10 000 CANDIDATS ──────────────────────────────────────────────────────
-  // Générer en lots de 500 pour ne pas saturer la mémoire
+  // ── CANDIDAT DE TEST ───────────────────────────────────────
+  // déclaré avec let ici — c'est le fix principal
+  let candidat = await prisma.candidat.findFirst({
+    where: { telephone: "22670000001" },
+  });
+
+  if (!candidat) {
+    candidat = await prisma.candidat.create({
+      data: {
+        nom:               "Doe",
+        prenom:            "John",
+        sexe:              "HOMME",
+        date_naissance:    new Date("1990-01-01"),
+        lieu_naissance:    "Ouagadougou",
+        pays_naissance:    "Burkina Faso",
+        numero_cnib:       "B123456789",
+        date_delivrance:   new Date("2015-06-15"),
+        telephone:         "22670000001",
+        email:             "johndoe@example.com",
+        mot_de_passe:      await bcrypt.hash("Password@123", 10),
+        statut_compte:     "ACTIF",
+        type_candidat:     "DIRECT",
+        choix_notification: "mail",
+      },
+    });
+  }
+  console.log("✅ Candidat de test prêt");
+
+  // ── INSCRIPTION DU CANDIDAT DE TEST ───────────────────────
+for (const concours of concoursList) {
+  const exists = await prisma.inscription.findFirst({
+    where: {
+      id_candidat: candidat.id_candidat,
+      id_concours: concours.id_concours,
+    },
+  });
+  if (!exists) {
+    await prisma.inscription.create({
+      data: {
+        statut_inscription: "EN_ATTENTE",
+        candidat: { connect: { id_candidat: candidat.id_candidat } },
+        concours: { connect: { id_concours: concours.id_concours } },
+        // On choisit le premier centre disponible
+        centre:   { connect: { id_centre: centres[0].id_centre } },
+        paiement: {
+          create: {
+            montant:         concours.frais_inscription,
+            statut_paiement: "ATTENTE",
+          },
+        },
+      },
+    });
+  }
+}
+  console.log("✅ Inscriptions du candidat de test prêtes");
+
+  // ── 10 000 CANDIDATS EN MASSE ──────────────────────────────
   const MOT_DE_PASSE_HASH = await bcrypt.hash("Password@123", 10);
   const TOTAL             = 10_000;
   const LOT               = 500;
 
-if (!candidat) {
-  candidat = await prisma.candidat.create({
-    data: {
-      nom: "Doe",
-      prenom: "John",
-      sexe: "HOMME",
-      date_naissance:  new Date("1990-01-01"),
-      lieu_naissance:  "Ouagadougou",
-      pays_naissance:  "Burkina Faso",
-      numero_cnib:     "B123456789",
-      date_delivrance: new Date("2015-06-15"),
-      telephone:       "+22670000000",
-      email:           "johndoe@example.com",
-      mot_de_passe:    await bcrypt.hash("Password@123", 10),
-    },
-  });
-}
-  // --- INSCRIPTION DU CANDIDAT DANS TOUS LES CONCOURS OUVERTS ---
-  for (const concours of concoursList) {
-    const exists = await prisma.inscription.findFirst({
-      where: {
-        id_candidat: candidat.id_candidat,
-        id_concours: concours.id_concours,
-      },
-    });
-    if (!exists) {
-      await prisma.inscription.create({
-        data: {
-          id_candidat: candidat.id_candidat,
-          id_concours: concours.id_concours,
-          statut_inscription: "EN_ATTENTE",
-          paiement: {
-            create: {
-              montant: concours.frais_inscription,
-              statut_paiement: "ATTENTE",
-            },
-          },
-        },
+  const nbExistants = await prisma.candidat.count();
+  if (nbExistants >= TOTAL) {
+    console.log(`⚠️  ${nbExistants} candidats déjà présents, étape ignorée.`);
+  } else {
+    console.log("\n⏳ Création des candidats en masse...");
+    let total_crees = 0;
+    let lot_num     = 0;
+
+    while (total_crees < TOTAL) {
+      const taille = Math.min(LOT, TOTAL - total_crees);
+      const data   = [];
+
+      for (let i = 0; i < taille; i++) {
+        const sexe   = Math.random() > 0.5 ? "HOMME" : "FEMME";
+        const prenom = sexe === "HOMME" ? rand(PRENOMS_H) : rand(PRENOMS_F);
+        const num    = total_crees + i + 1;
+
+        data.push({
+          nom:                rand(NOMS),
+          prenom,
+          sexe,
+          date_naissance:     genererDate(1975, 2000),
+          lieu_naissance:     rand(LIEUX_NAISSANCE),
+          pays_naissance:     "Burkina Faso",
+          numero_cnib:        `BF${String(num).padStart(8, '0')}`,
+          date_delivrance:    genererDate(2010, 2023),
+          telephone: `2267${String(randInt(1000000, 9999999))}`,
+          email:              null,
+          mot_de_passe:       MOT_DE_PASSE_HASH,
+          statut_compte:      "ACTIF",
+          type_candidat:      "DIRECT",
+          choix_notification: "sms",
+        });
+      }
+
+      await prisma.candidat.createMany({
+        data,
+        skipDuplicates: true,
       });
 
       total_crees += taille;
@@ -218,26 +269,22 @@ if (!candidat) {
     console.log("\n✅ Candidats créés");
   }
 
-  // ── INSCRIPTIONS EN MASSE ─────────────────────────────────────────────────
-  // Chaque candidat s'inscrit à 1 concours aléatoire dans un centre aléatoire
-  // On travaille par lots pour éviter les timeouts
-  console.log("\n⏳ Création des inscriptions...");
-
+  // ── INSCRIPTIONS EN MASSE ──────────────────────────────────
   const existantesInscriptions = await prisma.inscription.count();
   if (existantesInscriptions >= TOTAL) {
     console.log(`⚠️  ${existantesInscriptions} inscriptions déjà présentes, étape ignorée.`);
   } else {
-    // Récupérer tous les IDs candidats
+    console.log("\n⏳ Création des inscriptions...");
+
     const tousLesCandidats = await prisma.candidat.findMany({
       select: { id_candidat: true },
-      take: TOTAL,
+      take:   TOTAL,
     });
 
-    // Pour chaque concours, récupérer ses centres disponibles
     const centresParConcours = {};
     for (const concours of concoursList) {
-      const cc = await prisma.concoursCentre.findMany({
-        where: { concoursId: concours.id_concours },
+      const cc = await prisma.ConcoursCentre.findMany({
+        where:  { concoursId: concours.id_concours },
         select: { centreId: true },
       });
       centresParConcours[concours.id_concours] = cc.map(c => c.centreId);
@@ -247,11 +294,10 @@ if (!candidat) {
     const LOT_INS = 1000;
 
     for (let i = 0; i < tousLesCandidats.length; i += LOT_INS) {
-      const lot = tousLesCandidats.slice(i, i + LOT_INS);
+      const lot  = tousLesCandidats.slice(i, i + LOT_INS);
       const data = [];
 
       for (const { id_candidat } of lot) {
-        // Chaque candidat s'inscrit à UN concours aléatoire
         const concours  = rand(concoursList);
         const centresOk = centresParConcours[concours.id_concours];
         const id_centre = rand(centresOk);
@@ -259,7 +305,7 @@ if (!candidat) {
         data.push({
           id_candidat,
           id_concours:        concours.id_concours,
-          id_centre,
+          id_centre:          id_centre,
           statut_inscription: "EN_ATTENTE",
           date_inscription:   new Date(),
         });
@@ -267,7 +313,7 @@ if (!candidat) {
 
       await prisma.inscription.createMany({
         data,
-        skipDuplicates: true, // ignorer si déjà inscrit (id_candidat + id_concours unique)
+        skipDuplicates: true,
       });
 
       inscriptions_creees += lot.length;
@@ -276,7 +322,7 @@ if (!candidat) {
     console.log("\n✅ Inscriptions créées");
   }
 
-  // ── RÉSUMÉ ────────────────────────────────────────────────────────────────
+  // ── RÉSUMÉ ─────────────────────────────────────────────────
   const [nbCandidats, nbInscriptions] = await Promise.all([
     prisma.candidat.count(),
     prisma.inscription.count(),

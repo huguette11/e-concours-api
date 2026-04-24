@@ -125,7 +125,7 @@ model ConcoursCentre {
 
 model candidat {
   id_candidat     String        @id @default(uuid()) @db.Uuid
-  type_candidat   TypeCandidat  @default(DIRECT)
+  type_candidat   TypeCandidat  
   nom             String        @db.VarChar(100)
   prenom          String        @db.VarChar(100)
   nom_jeune_fille String?       @db.VarChar(100)
@@ -136,7 +136,7 @@ model candidat {
   numero_cnib     String        @unique @db.VarChar(50)
   date_delivrance DateTime      @db.Date
   telephone       String        @unique @db.VarChar(11)
-  email           String        @unique @db.VarChar(150)
+  email           String?       @unique @db.VarChar(150)
   mot_de_passe    String        @db.VarChar(255)
   recepisse       String?       @db.VarChar(500)
   statut_compte   StatutCompte  @default(ACTIF)
@@ -148,6 +148,7 @@ model candidat {
   emploi          String?       @db.VarChar(150)
   ministere       String?       @db.VarChar(150)
   deletedAt       DateTime?
+  choix_notification String @default("SMS") @db.VarChar(10)
   document        document[]
   inscription     inscription[]
   resultat        resultat[]
