@@ -292,8 +292,4 @@ model composer {
   @@unique([id_candidat, id_concours])
 }
 
-// model ministere{
-//   id_ministere Int @db.Uuid
-//   nom_ministere String
-//   description String? @db.text
-// }
+
