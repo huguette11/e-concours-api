@@ -539,7 +539,7 @@ export class AdminController {
 
       const id_concours = parseInt(req.params.id_concours);
       if (isNaN(id_concours)) {
-        return res.status(400).json({ error: "ID de concours invalide" });
+        return res.status(400).json({ error: "ID de concours incorrect" });
       }
 
       const concours = await prisma.concours.findUnique({ where: { id_concours } });
@@ -646,7 +646,7 @@ export class AdminController {
         return res.status(404).json({ error: "Candidat non trouvé" });
       }
 
-      // Suppression logique
+
       await prisma.candidat.update({
         where: { id_candidat },
         data: { deletedAt: new Date() },
